@@ -23,6 +23,25 @@ jobs:
       - run:
           name: Hello World
           command: echo "Hello World"
+    
+  build:
+      docker:
+        # specify the version you desire here
+        - image: circleci/node:7.10
+
+        # Specify service dependencies here if necessary
+        # CircleCI maintains a library of pre-built images
+        # documented at https://circleci.com/docs/2.0/circleci-images/
+        # - image: circleci/mongo:3.4.4
+
+      working_directory: ~/repo
+
+      steps:
+        - checkout
+
+        - run:
+            name: Hello World
+            command: echo "Hello World after Merge!"
 
       # Download and cache dependencies
       # - restore_cache:
@@ -47,3 +66,10 @@ workflows:
   pr-check-workflow:
     jobs:
     - pr_check
+  build-workflow:
+    jobs:
+    - build:
+        filters:
+          branches:
+            only:
+            - master
