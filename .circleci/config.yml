@@ -35,7 +35,6 @@ jobs:
           command: echo "Hello World"
 
      # Download and cache dependencies
-      - run: npm cache clear
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
