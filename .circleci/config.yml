@@ -8,7 +8,7 @@ jobs:
   pr_check:
     docker:
       # specify the version you desire here
-      - image: circleci/node:7.10
+      - image: circleci/node:10
       - image: circleci/mysql:8.0.4
         command: [--default-authentication-plugin=mysql_native_password]
         environment:
