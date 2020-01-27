@@ -26,7 +26,7 @@ var connection = mysql.createConnection({
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE
-})
+});
 }
 connection.connect(function(err) {
     if (err) {
@@ -50,3 +50,4 @@ initApp(app);
 app.listen(port, () => console.log(`Started listening on port ${port}...`))
 
 module.exports['connection'] = connection
+module.exports = app;

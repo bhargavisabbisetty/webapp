@@ -17,8 +17,8 @@ jobs:
           MYSQL_USER: user
           MYSQL_PASSWORD: rootpw
           MYSQL_HOST: 127.0.0.1
-        security_opt:
-          - seccomp:unconfined
+        # security_opt:
+        #   - seccomp:unconfined
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -65,15 +65,6 @@ jobs:
             sudo apt-get update && sudo apt install -y mysql-client
             mysql -h 127.0.0.1 -u root -prootpw test_db < sql-data/dummy.sql
             mysql -h 127.0.0.1 -u root -prootpw --execute="SELECT * FROM test_db.userdetails"
-      # run tests!
-      # - run: |
-      #     for i in `seq 1 10`;
-      #       do
-      #         npm run prod && npm test && echo Success && exit 0
-      #         echo -n .
-      #         sleep 1
-      #       done
-      #       echo Failed waiting for MySQL && exit 1
       - run: npm test
       
     

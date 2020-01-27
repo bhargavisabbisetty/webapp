@@ -31,6 +31,7 @@
     "uuid": "^3.4.0"
   },
   "devDependencies": {
+    "@types/chai-http": "^4.2.0",
     "nodemon": "^2.0.2"
   }
 }
