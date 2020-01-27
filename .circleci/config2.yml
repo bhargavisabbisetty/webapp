@@ -40,69 +40,7 @@ jobs:
             - v1-dependencies-{{ checksum "package.json" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-      # - run: npm rebuild bcrypt --update-binary
-      - run: npm install
-
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-
-      - run:
-      # Our primary container isn't MYSQL so run a sleep command until it's ready.
-          name: Waiting for MySQL to be ready
-          command: |
-            for i in `seq 1 10`;
-            do
-              nc -z 127.0.0.1 3306 && echo Success && exit 0
-              echo -n .
-              sleep 1
-            done
-            echo Failed waiting for MySQL && exit 1
-      - run:
-          name: Install MySQL CLI; Import dummy data; run an example query
-          command: |
-            sudo apt-get update && sudo apt install -y mysql-client
-            mysql -h 127.0.0.1 -u root -proot test_db < sql-data/dummy.sql
-            mysql -h 127.0.0.1 -u root -proot --execute="SELECT * FROM test_db.userdetails"
-      - run: npm test
-
-  build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:10
-      - image: circleci/mysql:8.0.4
-        command: [--default-authentication-plugin=mysql_native_password]
-        environment:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test_db
-          MYSQL_USER: user
-          MYSQL_PASSWORD: root
-          MYSQL_HOST: 127.0.0.1
-        # security_opt:
-        #   - seccomp:unconfined
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
-
-    steps:
-      - checkout
-    #  - run: 
-      - run:
-          name: Hello World
-          command: echo "Hello World"
-
-     # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-      # - run: npm rebuild bcrypt --update-binary
+      - run: npm rebuild bcrypt --update-binary
       - run: npm install
 
       - save_cache:
@@ -130,6 +68,24 @@ jobs:
       - run: npm test
       
     
+  build:
+      docker:
+        # specify the version you desire here
+        - image: circleci/node:7.10
+
+        # Specify service dependencies here if necessary
+        # CircleCI maintains a library of pre-built images
+        # documented at https://circleci.com/docs/2.0/circleci-images/
+        # - image: circleci/mongo:3.4.4
+
+      working_directory: ~/repo
+
+      steps:
+        - checkout
+
+        - run:
+            name: Hello World
+            command: echo "Hello World after Merge!"
 
 workflows:
   version: 2
