@@ -4,8 +4,8 @@
   "description": "CSYE 6225 Assignment 2",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive --exit",
-    "test1": "mocha",
+    "test": "mocha",
+    "test1": "mocha --recursive --exit",
     "dev": "npm start"
   },
   "keywords": [],
