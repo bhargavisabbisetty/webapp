@@ -17,8 +17,6 @@ jobs:
           MYSQL_USER: user
           MYSQL_PASSWORD: root
           MYSQL_HOST: 127.0.0.1
-        # security_opt:
-        #   - seccomp:unconfined
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -79,8 +77,6 @@ jobs:
           MYSQL_USER: user
           MYSQL_PASSWORD: root
           MYSQL_HOST: 127.0.0.1
-        # security_opt:
-        #   - seccomp:unconfined
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
