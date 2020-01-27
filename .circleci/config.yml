@@ -12,10 +12,10 @@ jobs:
       - image: circleci/mysql:8.0.4
         command: [--default-authentication-plugin=mysql_native_password]
         environment:
-          MYSQL_ROOT_PASSWORD: rootpw
+          MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: test_db
           MYSQL_USER: user
-          MYSQL_PASSWORD: rootpw
+          MYSQL_PASSWORD: root
           MYSQL_HOST: 127.0.0.1
         # security_opt:
         #   - seccomp:unconfined
@@ -63,8 +63,8 @@ jobs:
           name: Install MySQL CLI; Import dummy data; run an example query
           command: |
             sudo apt-get update && sudo apt install -y mysql-client
-            mysql -h 127.0.0.1 -u root -prootpw test_db < sql-data/dummy.sql
-            mysql -h 127.0.0.1 -u root -prootpw --execute="SELECT * FROM test_db.userdetails"
+            mysql -h 127.0.0.1 -u root -proot test_db < sql-data/dummy.sql
+            mysql -h 127.0.0.1 -u root -proot --execute="SELECT * FROM test_db.userdetails"
       - run: npm test
       
     

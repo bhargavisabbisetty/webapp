@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === 'production') {
   var connection = mysql.createConnection({
       host: '127.0.0.1',
       user: 'root',
-      password: 'rootpw',
+      password: 'root',
       database: 'test_db'
   });
 }
