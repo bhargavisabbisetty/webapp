@@ -31,7 +31,7 @@ jobs:
           name: Hello World
           command: echo "Hello World"
 
-      Download and cache dependencies
+     # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
@@ -45,7 +45,7 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      run tests!
+      # run tests!
       - run: yarn test
       
       - run:
