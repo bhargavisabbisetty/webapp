@@ -4,14 +4,15 @@ const port = process.env.PORT || 3000
 const bodyParser = require('body-parser')
 const mysql = require('mysql');
 const basicAuth = require('./helpers/basic_authentication');
+require('dotenv').config();
 
 
 var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : 'bhargavI123',
-  database : 'csye6225'
-});
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE
+})
 
 connection.connect(function(err) {
     if (err) {
