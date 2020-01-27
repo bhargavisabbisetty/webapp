@@ -15,7 +15,6 @@ jobs:
           MYSQL_DATABASE: test_db
           MYSQL_USER: user
           MYSQL_PASSWORD: passw0rd
-          MYSQL_HOST: 127.0.0.1
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -89,10 +88,10 @@ workflows:
   pr-check-workflow:
     jobs:
     - pr_check
-  build-workflow:
-    jobs:
-    - build:
-        filters:
-          branches:
-            only:
-            - master
+  # build-workflow:
+  #   jobs:
+  #   - build:
+  #       filters:
+  #         branches:
+  #           only:
+  #           - master
