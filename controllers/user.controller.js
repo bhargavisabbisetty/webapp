@@ -2,7 +2,7 @@ var bcrypt = require('bcrypt');
 const saltRounds = 10
 const server = require('./../server')
 const uuid = require('uuid/v4')
-const Validator = require('./../services/Validator')
+const Validator = require('./../services/validator')
 const validatorObj = new Validator()
 
 /**
