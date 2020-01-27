@@ -6,10 +6,10 @@ const mysql = require('mysql');
 const basicAuth = require('./helpers/basic_authentication');
 require('dotenv').config();
 
-console.log(MYSQL_USER)
-console.log(MYSQL_PASSWORD)
-console.log(MYSQL_HOST)
-console.log(MYSQL_DATABASE)
+console.log(process.env.MYSQL_USER)
+console.log(process.env.MYSQL_PASSWORD)
+console.log(process.env.MYSQL_HOST)
+console.log(process.env.MYSQL_DATABASE)
 
 var connection = mysql.createConnection({
   host: process.env.MYSQL_HOST || '127.0.0.1',
