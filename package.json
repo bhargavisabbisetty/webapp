@@ -4,8 +4,9 @@
   "description": "CSYE 6225 Assignment 2",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive --exit",
-    "dev": "npm start"
+    "test": "NODE_ENV=production mocha --recursive --exit",
+    "dev": "npm start",
+    "prod": "NODE_ENV=production node server.js"
   },
   "keywords": [],
   "author": "",
@@ -16,17 +17,19 @@
     "body-parser": "^1.19.0",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
+    "cross-env": "^7.0.0",
     "dotenv": "^8.2.0",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
+    "mocha": "^7.0.0",
     "mysql": "^2.17.1",
+    "production": "0.0.2",
     "regex": "^0.1.1",
+    "should": "^13.2.3",
+    "supertest": "^4.0.2",
     "uuid": "^3.4.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.2",
-    "mocha": "^7.0.0",
-    "should": "^13.2.3",
-    "supertest": "^4.0.2"
+    "nodemon": "^2.0.2"
   }
 }

@@ -1,9 +1,11 @@
 var supertest = require("supertest");
 let chai = require('chai');
 let chaiHttp = require('chai-http');
+let temp = require('./../server')
+let should = chai.should();
 chai.use(chaiHttp);
 var expect = chai.expect;
-let should = chai.should();
+// let should = chai.should();
 let assert = require('assert')
 
 // This agent refers to PORT where program is runninng.
@@ -24,8 +26,13 @@ describe("Unit test for POST REQUEST: Creating a new User", function () {
                 "email_address": "roycharlie@gmail.com",
                 "password": "royCharlie01!"
               };
-        server.post('/user').send(data).expect(400).end((err, res) => {
-            console.log("Exception case " + res.body.message);
+       server.post('/user').send(data).expect(400).end((err, res) => {
+            if(err){
+                console.log("Exception case " + err);
+            }
+            else{
+                console.log("Exception case " + res);
+            }
             done();
         });       
      });
@@ -159,7 +166,7 @@ describe("Unit test for GET REQUEST: Getting User Details", function () {
     });
 
 
-//PUT REQUEST ("/user/self")
+// //PUT REQUEST ("/user/self")
 
     describe("Unit test for PUT REQUEST: Update User Details", function () {
     
