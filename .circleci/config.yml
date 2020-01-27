@@ -65,7 +65,7 @@ jobs:
             mysql -h 127.0.0.1 -u root -prootpw test_db < sql-data/dummy.sql
             mysql -h 127.0.0.1 -u root -prootpw --execute="SELECT * FROM test_db.userdetails"
       # run tests!
-      # - run: npm start
+      - run: npm start
       # - run: npm test
     
   build:
