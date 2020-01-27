@@ -4,8 +4,7 @@
   "description": "CSYE 6225 Assignment 2",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=production mocha",
-    "test1": "mocha --recursive --exit",
+    "test": "NODE_ENV=production mocha --recursive --exit",
     "dev": "npm start",
     "prod": "NODE_ENV=production node server.js"
   },
