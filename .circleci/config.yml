@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - checkout
-
+      - run: sudo apt-get update && sudo apt install -y mysql-client
       - run:
           name: Hello World
           command: echo "Hello World"
@@ -46,7 +46,6 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: sudo apt install -y mysql-client
       - run:
       # Our primary container isn't MYSQL so run a sleep command until it's ready.
           name: Waiting for MySQL to be ready
