@@ -67,7 +67,10 @@ jobs:
             mysql -h 127.0.0.1 -u root -prootpw --execute="SELECT * FROM test_db.userdetails"
       # run tests!
       - run: npm run prod
-      # - run: npm test
+      - run: echo "Successfully started connection"
+      - run: 
+          name: "Testing"
+          command: npm test
     
   build:
       docker:
