@@ -6,28 +6,28 @@ const mysql = require('mysql');
 const basicAuth = require('./helpers/basic_authentication');
 require('dotenv').config();
 
-console.log(process.env.MYSQL_USER)
-console.log(process.env.MYSQL_PASSWORD)
-console.log(process.env.MYSQL_HOST)
-console.log(process.env.MYSQL_DATABASE)
+// console.log(process.env.MYSQL_USER)
+// console.log(process.env.MYSQL_PASSWORD)
+// console.log(process.env.MYSQL_HOST)
+// console.log(process.env.MYSQL_DATABASE)
 
-if (process.env.NODE_ENV === 'production') {
-  console.log("ENV Production: " + process.env.NODE_ENV);
+// if (process.env.NODE_ENV === 'production') {
+//   console.log("ENV Production: " + process.env.NODE_ENV);
   var connection = mysql.createConnection({
       host: '127.0.0.1',
       user: 'root',
       password: 'root',
       database: 'test_db'
   });
-}
-else{
-var connection = mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE
-});
-}
+// }
+// else{
+// var connection = mysql.createConnection({
+//   host: process.env.MYSQL_HOST,
+//   user: process.env.MYSQL_USER,
+//   password: process.env.MYSQL_PASSWORD,
+//   database: process.env.MYSQL_DATABASE
+// });
+// }
 connection.connect(function(err) {
     if (err) {
       console.error('error connecting: ' + err.stack);
