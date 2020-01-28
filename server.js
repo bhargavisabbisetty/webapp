@@ -7,12 +7,12 @@ const basicAuth = require('./helpers/basic_authentication');
 require('dotenv').config();
 
 if (process.env.NODE_ENV === 'production') {
-  console.log("ENV Production: " + process.env.NODE_ENV);
+  console.log("ENV Production: " + process.env.MYSQL_ROOT_PASSWORD);
   var connection = mysql.createConnection({
       host: '127.0.0.1',
       user: 'root',
-      password: 'root',
-      database: 'test_db'
+      password: process.env.MYSQL_ROOT_PASSWORD,
+      database: 'csye6225'
   });
 }
 else{
