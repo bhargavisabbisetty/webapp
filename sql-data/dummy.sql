@@ -13,7 +13,7 @@ CREATE TABLE userdetails (
 
 INSERT INTO userdetails
 VALUES (
-	"1",
+	"7ea18db9-517f-49bb-b652-ffec9e5cbe55",
 	"Foo",
 	"Baz",
 	"foo.fsd@fdsf.com",
