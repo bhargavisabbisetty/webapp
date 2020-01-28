@@ -6,23 +6,13 @@ const mysql = require('mysql');
 const basicAuth = require('./helpers/basic_authentication');
 require('dotenv').config();
 
-// if (process.env.NODE_ENV === 'production') {
-//   console.log("ENV Production: " + process.env.MYSQL_ROOT_PASSWORD);
-//   var connection = mysql.createConnection({
-//       host: '127.0.0.1',
-//       user: 'root',
-//       password: process.env.MYSQL_ROOT_PASSWORD,
-//       database: 'csye6225'
-//   });
-// }
-// else{
 var connection = mysql.createConnection({
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE
 });
-// }
+
 connection.connect(function(err) {
     if (err) {
       console.error('error connecting: ' + err.stack);
