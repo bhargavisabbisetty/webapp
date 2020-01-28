@@ -68,7 +68,7 @@ jobs:
             sudo apt-get update && sudo apt install -y mysql-client
             mysql -h 127.0.0.1 -u root -proot csye6225 < sql-data/dummy.sql
             mysql -h 127.0.0.1 -u root -proot --execute="SELECT * FROM csye6225.userdetails"
-      - run: npm test
+      - run: npm testprod
 
   build:
     docker:
@@ -135,7 +135,7 @@ jobs:
             sudo apt-get update && sudo apt install -y mysql-client
             mysql -h 127.0.0.1 -u root -proot csye6225 < sql-data/dummy.sql
             mysql -h 127.0.0.1 -u root -proot --execute="SELECT * FROM csye6225.userdetails"
-      - run: npm test
+      - run: npm testprod
       
     
 
