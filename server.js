@@ -6,6 +6,7 @@ const mysql = require('mysql');
 const basicAuth = require('./helpers/basic_authentication');
 require('dotenv').config();
 
+if(process.env.NODE_ENV != 'production'){
 var connection = mysql.createConnection({
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USER,
@@ -20,7 +21,7 @@ connection.connect(function(err) {
     }
     console.log('connected as id ' + connection.threadId);
   });
-
+}
 app.get('/',(req,res) => {
     res.send('CSYE 6225 Assignment 2');
 });
