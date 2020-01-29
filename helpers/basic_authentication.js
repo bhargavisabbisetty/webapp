@@ -1,6 +1,5 @@
 var userService = ''
 if(process.env.NODE_ENV == 'production'){
-// var rewire = require('rewire')
 userService = require('./../services/user.service.mock')
 }
 else{

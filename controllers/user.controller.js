@@ -6,8 +6,6 @@ const Validator = require('./../services/validator')
 const validatorObj = new Validator()
 var userService = ''
 if(process.env.NODE_ENV == 'production'){
-    // console.log(' I got hit')
-// var rewire = require('rewire')
 userService = require('./../services/user.service.mock')
 }
 else{
