@@ -5,12 +5,12 @@ let temp = require('./../server')
 let should = chai.should();
 chai.use(chaiHttp);
 var expect = chai.expect;
-// let should = chai.should();
 let assert = require('assert')
 
 // This agent refers to PORT where program is runninng.
 
 var server = supertest.agent("http://localhost:3000/v1");
+// var mockServer = nock("http://localhost:3000/v1")
 
 // UNIT test begin
 
@@ -79,7 +79,8 @@ describe("Unit test for POST REQUEST: Creating a new User", function () {
         });       
      });
 
-    it('Success case: Will accept the correct details of new user with valid input email',function(done){
+     it('Success case: Will accept the correct details of new user with valid input email',function(done){
+        // mockServer.post('/user').reply('success')
         var data = 
             {
                 "first_name": "Roy",
@@ -166,7 +167,7 @@ describe("Unit test for GET REQUEST: Getting User Details", function () {
     });
 
 
-// //PUT REQUEST ("/user/self")
+ //PUT REQUEST ("/user/self")
 
     describe("Unit test for PUT REQUEST: Update User Details", function () {
     

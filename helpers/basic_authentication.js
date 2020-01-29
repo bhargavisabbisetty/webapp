@@ -1,4 +1,10 @@
-const userService = require('./../services/user.service');
+var userService = ''
+if(process.env.NODE_ENV == 'production'){
+userService = require('./../services/user.service.mock')
+}
+else{
+userService = require('./../services/user.service');
+}
 
 module.exports = basicAuth;
 
@@ -9,7 +15,6 @@ module.exports = basicAuth;
  */
 function basicAuth(req, res, next) {
     // make authenticate path public
-    // console.log('i am here')
     if (req.path === '/v1/user') {
         return next();
     }
