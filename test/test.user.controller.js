@@ -5,9 +5,7 @@ let temp = require('./../server')
 let should = chai.should();
 chai.use(chaiHttp);
 var expect = chai.expect;
-// let should = chai.should();
 let assert = require('assert')
-// var nock = require('nock')
 
 // This agent refers to PORT where program is runninng.
 
