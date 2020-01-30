@@ -19,7 +19,7 @@
     ```
     In DATABASE_NAME mention the name of the database you want to create.
 4. Navigate to folder ` webapp `
-5. run `npm install` in terminal
+5. run `npm install` in terminal to make setup
 6. run application by ` nodemon server.js ` or ` npm run start `
 
 ## Running Tests
