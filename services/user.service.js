@@ -44,7 +44,7 @@ function authenticate(email_address, password, callback) {
 
 function isUserExist(email_address, callback){
     server.connection.query('SELECT * from userdetails where email_address = ?', email_address, function (error, results, fields) {
-        if(results != undefined){
+        if(results.length != 0){
             callback(true)
         }
         else{
