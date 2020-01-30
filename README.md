@@ -1,6 +1,6 @@
 # CSYE 6225 - Spring 2020
 
-#Web Application
+# Web Application
 
 ## Technology Stack
 
