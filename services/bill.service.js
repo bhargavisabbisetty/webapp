@@ -34,7 +34,7 @@ function getBillById(billId, callback) {
 }
 
 function updateBill(params, callback) {
-    server.connection.query("UPDATE userdetails SET first_name = ?, last_name = ?, password = ?, account_updated = ? WHERE email_address = ? ",
+    server.connection.query("UPDATE billdetails SET updated_ts = ?,vendor = ?, bill_date = ?, due_date = ?, amount_due = ?, categories = ?, paymentStatus = ? WHERE id = ? and owner_id = ?",
         params,
         function (error, results, fields) {
             if (error) {
