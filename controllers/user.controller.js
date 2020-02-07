@@ -54,15 +54,12 @@ exports.post = (request, response) => {
                                 userService.insertUser(params, function (msg) {
                                     if (msg == 'success') {
                                         response.status(201).json({
-                                            message: "User added successfully",
-                                            details: {
                                                 "id": id,
                                                 "first_name": first_name,
                                                 "last_name": last_name,
                                                 email_address: email_address,
                                                 "account_created": account_created,
                                                 "account_updated": account_updated
-                                            }
                                         });
                                     } else {
                                         response.status(400).json({
@@ -70,8 +67,6 @@ exports.post = (request, response) => {
                                         });
                                     }
                                 })
-
-                                // response.end(JSON.stringify(results));
                             });
                         }
                     });
@@ -109,16 +104,13 @@ exports.post = (request, response) => {
 exports.get = (request, response) => {
     let user = request.user
     response.status(200).json({
-        message: "User Details",
-        details: {
             id: user.id,
             first_name: user.first_name,
             last_name: user.last_name,
             email_address: user.email_address,
             account_created: user.account_created,
             account_updated: user.account_updated
-        }
-    });
+        });
 }
 
 /**
