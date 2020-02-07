@@ -31,7 +31,6 @@ describe("Unit test for POST REQUEST: Create a Bill", function () {
         .end((err, res) => {
             res.should.have.status(201);
             res.body.should.be.a('object');
-            res.body.message.should.equal('Bill added successfully');
             done();
         });       
     });

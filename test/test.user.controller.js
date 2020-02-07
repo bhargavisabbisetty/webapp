@@ -127,9 +127,9 @@ describe("Unit test for GET REQUEST: Getting User Details", function () {
         .end((err, res) => {
             res.should.have.status(200);
             res.body.should.be.a('object');
-            res.body.details.first_name.should.equal('Roy');
-            res.body.details.last_name.should.equal('Charlie');
-            res.body.details.email_address.should.equal('roycharlie@gmail.com');
+            res.body.first_name.should.equal('Roy');
+            res.body.last_name.should.equal('Charlie');
+            res.body.email_address.should.equal('roycharlie@gmail.com');
             console.log(res.body.message);
             done();
         });       
