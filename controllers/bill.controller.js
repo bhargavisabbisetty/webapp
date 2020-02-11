@@ -22,7 +22,7 @@ Object.freeze(PaymentStatusEnum);
 /**
  * 
  * This method is used to make a post request. It is a public endpoint.
- * This method helps to create new user.
+ * This method helps to create new bill.
  */
 
 exports.post = (request, response) => {
@@ -62,8 +62,6 @@ exports.post = (request, response) => {
                                     billService.insertBill(params, function (msg) {
                                         if (msg == 'success') {
                                             response.status(201).json({
-                                                message: "Bill added successfully",
-                                                details: {
                                                     "id": id,
                                                     "created_ts": created_ts,
                                                     "updated_ts": updated_ts,
@@ -74,8 +72,7 @@ exports.post = (request, response) => {
                                                     "amount_due": amount_due,
                                                     "categories": categoriesTemp,
                                                     "paymentStatus": paymentStatus
-                                                }
-                                            });
+                                                });
                                         }
                                     });
                                 } else {
@@ -165,8 +162,7 @@ exports.getBillById = (request, response) => {
         if (results.length == 0) {
             console.log("No bill found with this id");
             response.status(404).json({
-                message: "No bill found with this id",
-                results
+                message: "No bill found with this id"
             });
         } else {
             let bill = results[0]
@@ -180,10 +176,7 @@ exports.getBillById = (request, response) => {
                 for (var status in PaymentStatusEnum) {
                     if (PaymentStatusEnum[status] == bill.paymentStatus) {
                         bill.paymentStatus = status
-                        response.status(200).json({
-                            message: "Bill Found",
-                            bill
-                        });
+                        response.status(200).json(bill);
                         break
                     }
                 }
@@ -235,8 +228,6 @@ exports.put = (request, response) => {
                                                 billService.updateBill(params, function callback(msg) {
                                                     if (msg == 'success') {
                                                         response.status(200).json({
-                                                            message: "Bill updated successfully",
-                                                            details: {
                                                                 "id": billId,
                                                                 "created_ts": created_ts,
                                                                 "updated_ts": updated_ts,
@@ -247,7 +238,6 @@ exports.put = (request, response) => {
                                                                 "amount_due": amount_due,
                                                                 "categories": categoriesTemp,
                                                                 "paymentStatus": paymentStatus
-                                                            }
                                                         });
                                                     }
                                                 });
@@ -313,8 +303,7 @@ exports.deleteBillById = (request, response) => {
         if (results.length == 0) {
             console.log("No bill found with this id");
             response.status(404).json({
-                message: "No bill found with this id",
-                results
+                message: "No bill found with this id"
             });
         } else {
             let bill = results[0]

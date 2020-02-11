@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const mysql = require('mysql');
 const basicAuth = require('./helpers/basic_authentication');
 const sql = require('./helpers/sql_init')
+const fileUpload = require('express-fileupload');
 require('dotenv').config({
   silent: process.env.NODE_ENV === 'production'
 });
@@ -48,6 +49,7 @@ app.use(function (error, req, res, next) {
 app.use(bodyParser.urlencoded({
   extended: false
 }));
+app.use(fileUpload());
 let initApp = require('./app');
 initApp(app);
 

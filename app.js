@@ -5,4 +5,7 @@ module.exports = function (app) {
 
     let billRoutes = require('./routes/bill.route');
     billRoutes(app);
+
+    let fileRoutes = require('./routes/file.route');
+    fileRoutes(app);
 }
