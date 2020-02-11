@@ -22,7 +22,7 @@ Object.freeze(PaymentStatusEnum);
 /**
  * 
  * This method is used to make a post request. It is a public endpoint.
- * This method helps to create new user.
+ * This method helps to create new bill.
  */
 
 exports.post = (request, response) => {
