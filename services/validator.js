@@ -24,7 +24,7 @@ class Validator {
     }
 
     validateDateFormat(date) {
-        var dateformat = /^[0-9]{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/
+        var dateformat = /^[0-9]{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/
         // Match the date format through regular expression
         if (dateformat.test(date)) {
             // Extract the string into month, date and year

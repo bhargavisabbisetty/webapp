@@ -21,7 +21,7 @@ function insertFile(params, callback) {
 
 function getFileByBillId(billId, callback) {
     server.connection.query('SELECT * from filedetails where bill_id = ?', billId, function (error, results, fields) {
-        callback(results)
+            callback(results)
 });
 }
 

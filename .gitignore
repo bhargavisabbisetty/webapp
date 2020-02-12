@@ -7,15 +7,18 @@ yarn-error.log*
 lerna-debug.log*
 
 #vscode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.code-workspace
+.vscode
+# .vscode/*
+# !.vscode/settings.json
+# !.vscode/tasks.json
+# !.vscode/launch.json
+# !.vscode/extensions.json
+# *.code-workspace
 
+controllers/bill.controller4.js
+controllers/bill1.controller.js
+controllers/bill2.controller.js
 test/test1.user.controller.js
-services/file.service.mock.js
 uploads/*.pdf
 uploads/*.png
 uploads/*.jpg
