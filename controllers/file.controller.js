@@ -56,7 +56,7 @@ exports.post = (request, response) => {
                     let file = request.files.file;
                     if (file != undefined) {
                         var fileFormat = (file.name).split(".");
-                        url = './uploads/' + fileFormat[0] + '_'+ user.id + '_' + billId + '_' + Date.now() + '.' + fileFormat[fileFormat.length - 1]
+                        url = process.env.FOLDER + fileFormat[0] + '_'+ user.id.substring(1,8) + '_' + billId.substring(1,8) + '_' + Date.now() + '.' + fileFormat[fileFormat.length - 1]
                         var ext = fileFormat[fileFormat.length - 1]
                         if (ext != 'pdf' && ext != 'jpeg' && ext != 'jpg' && ext != 'png') {
                             response.status(400).json({
