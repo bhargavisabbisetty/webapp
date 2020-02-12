@@ -4,7 +4,7 @@ const server = require('./../server')
 const uuid = require('uuid/v4')
 const Validator = require('./../services/validator')
 const validatorObj = new Validator()
-var fs = require('fs');
+var fs = require('fs')
 var billService = ''
 var fileService = ''
 if (process.env.NODE_ENV == 'production') {
@@ -14,7 +14,7 @@ if (process.env.NODE_ENV == 'production') {
 }
 
 if (process.env.NODE_ENV == 'production') {
-    // fileService = require('./../services/file.service.mock')
+    fileService = require('./../services/file.service.mock')
 } else {
     fileService = require('./../services/file.service');
 }
@@ -54,61 +54,69 @@ exports.post = (request, response) => {
                     });
                 } else {
                     let file = request.files.file;
-                    var fileFormat = (file.name).split(".");
-                    url = './uploads/' + fileFormat[0] + '-' + Date.now() + '.' + fileFormat[fileFormat.length - 1]
-                    var ext = fileFormat[fileFormat.length - 1]
-                    if (ext != 'pdf' && ext != 'jpeg' && ext != 'jpg' && ext != 'png') {
+                    if (file != undefined) {
+                        var fileFormat = (file.name).split(".");
+                        url = './uploads/' + fileFormat[0] + '_'+ user.id + '_' + billId + '_' + Date.now() + '.' + fileFormat[fileFormat.length - 1]
+                        var ext = fileFormat[fileFormat.length - 1]
+                        if (ext != 'pdf' && ext != 'jpeg' && ext != 'jpg' && ext != 'png') {
+                            response.status(400).json({
+                                message: "Please attach a file with the following formats: jpg, png, jpeg, pdf"
+                            });
+                        } else {
+                            fileService.getFileByBillId(billId, function callback(results) {
+                                if (results.length == 0) {
+                                    const params = {
+                                        "id": id,
+                                        "upload_date": upload_date,
+                                        "file_name": file.name,
+                                        "file_owner": owner_id,
+                                        "bill_id": billId,
+                                        "size": file.size,
+                                        "md5": file.md5,
+                                        "encoding": file.encoding,
+                                        "mimetype": file.mimetype,
+                                        "url": url
+                                    };
+                                    fileService.insertFile(params, function (msg) {
+                                        if (msg == 'success') {
+                                            file.mv(url, function (err) {
+                                                if (err) {
+                                                    const params = [id, owner_id, billId]
+                                                    fileService.deleteFileById(params, function callback(results) {
+                                                        console.log(`Deleted ${results.affectedRows} row(s)`);
+                                                        response.status(500).send(err);
+                                                    }, function handleError(error) {
+                                                        return response.status(500).send(error);
+                                                    })
+
+
+                                                } else {
+                                                    response.status(201).json({
+                                                        "file_name": file.name,
+                                                        "id": id,
+                                                        "url": url,
+                                                        "upload_date": upload_date
+                                                    });
+                                                }
+                                            });
+
+                                        } else {
+                                            response.status(500).json(msg)
+                                        }
+                                    });
+                                } else {
+                                    response.status(400).json({
+                                        message: "There is already a file attached to bill. Please delete it to attach new one"
+                                    });
+
+                                }
+                            });
+                        }
+                    }
+                    else
+                    {
                         response.status(400).json({
-                            message: "Please attach a file with the following formats: jpg, png, jpeg, pdf"
-                        });
-                    } else {
-                        fileService.getFileByBillId(billId, function callback(results) {
-                            if (results.length == 0) {
-                                const params = {
-                                    "id": id,
-                                    "upload_date": upload_date,
-                                    "file_name": file.name,
-                                    "file_owner": owner_id,
-                                    "bill_id": billId,
-                                    "size": file.size,
-                                    "md5": file.md5,
-                                    "encoding": file.encoding,
-                                    "mimetype": file.mimetype,
-                                    "url": url
-                                };
-                                fileService.insertFile(params, function (msg) {
-                                    if (msg == 'success') {
-                                        file.mv(url, function (err) {
-                                            if (err) {
-                                                const params = [id, owner_id, billId]
-                                                fileService.deleteFileById(params, function callback(results) {
-                                                    console.log(`Deleted ${results.affectedRows} row(s)`);
-                                                    response.status(500).send(err);
-                                                }, function handleError(error) {
-                                                    return response.status(500).send(error);
-                                                })
-
-
-                                            } else {
-                                                response.status(201).json({
-                                                    "file_name": file.name,
-                                                    "id": id,
-                                                    "url": url,
-                                                    "upload_date": upload_date
-                                                });
-                                            }
-                                        });
-
-                                    } else {
-                                        response.status(500).json(msg)
-                                    }
-                                });
-                            } else {
-                                response.status(400).json({
-                                    message: "There is already a file attached to bill. Please delete it to attach new one"
-                                });
-
-                            }
+                            message: "Bad request"
                         });
                     }
                 }

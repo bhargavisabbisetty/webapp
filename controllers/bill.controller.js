@@ -5,6 +5,13 @@ const uuid = require('uuid/v4')
 const Validator = require('./../services/validator')
 const validatorObj = new Validator()
 var billService = ''
+var fileService = ''
+var fs = require('fs')
+if (process.env.NODE_ENV == 'production') {
+    fileService = require('./../services/file.service.mock')
+} else {
+    fileService = require('./../services/file.service');
+}
 if (process.env.NODE_ENV == 'production') {
     billService = require('./../services/bill.service.mock')
 } else {
@@ -54,7 +61,7 @@ exports.post = (request, response) => {
                                         "owner_id": owner_id,
                                         "vendor": vendor,
                                         "bill_date": bill_date,
-                                        "due_date": bill_date,
+                                        "due_date": due_date,
                                         "amount_due": amount_due,
                                         "categories": categoriesString,
                                         "paymentStatus": PaymentStatusEnum[paymentStatus]
@@ -62,17 +69,18 @@ exports.post = (request, response) => {
                                     billService.insertBill(params, function (msg) {
                                         if (msg == 'success') {
                                             response.status(201).json({
-                                                    "id": id,
-                                                    "created_ts": created_ts,
-                                                    "updated_ts": updated_ts,
-                                                    "owner_id": owner_id,
-                                                    "vendor": vendor,
-                                                    "bill_date": bill_date,
-                                                    "due_date": due_date,
-                                                    "amount_due": amount_due,
-                                                    "categories": categoriesTemp,
-                                                    "paymentStatus": paymentStatus
-                                                });
+                                                "id": id,
+                                                "created_ts": created_ts,
+                                                "updated_ts": updated_ts,
+                                                "owner_id": owner_id,
+                                                "vendor": vendor,
+                                                "bill_date": bill_date,
+                                                "due_date": due_date,
+                                                "amount_due": amount_due,
+                                                "categories": categoriesTemp,
+                                                "paymentStatus": paymentStatus,
+                                                "attachment": {}
+                                            });
                                         }
                                     });
                                 } else {
@@ -128,31 +136,58 @@ exports.post = (request, response) => {
 
 exports.getAll = (request, response) => {
     let user = request.user
-    billService.getAll(user, function callback(results) {
+    billService.getBillsWithAttachmentsBasedOnUserId([user.id],function callback(results) {
+      console.log('hi')
         if (results.length == 0) {
             console.log("No bills are available");
             response.status(200).json({
                 message: "No bills are available",
                 results
             });
-        } else {
-            for (var i in results) {
-                var bill = results[i]
-                results[i].categories = results[i].categories.split(",")
-                // Modify the file property
-                for (var status in PaymentStatusEnum) {
-                    if (PaymentStatusEnum[status] == bill.paymentStatus) {
-                        results[i].paymentStatus = status
-                        break
-                    }
+        } 
+        else{    
+            let resultArray = [];    
+        for (i in results){
+            let bill = results[i];
+           let billObj = {};
+           billObj.id = bill.id;
+           billObj.created_ts = bill.created_ts;
+           billObj.updated_ts = bill.updated_ts;
+           billObj.owner_id = bill.owner_id;
+           billObj.vendor = bill.vendor;
+           billObj.bill_date = bill.bill_date;
+           billObj.due_date = bill.due_date;
+           billObj.amount_due = bill.amount_due;
+           billObj.categories = bill.categories.split(",")
+           for (var status in PaymentStatusEnum) {
+               if (PaymentStatusEnum[status] == bill.paymentStatus) {
+                   billObj.paymentStatus = status
+                   break
+               }
+           }
+           if(bill.file_id == null)
+           {
+               billObj.attachment = {}
+           }
+           else
+           {
+            billObj.attachment = {
+                filename: bill.file_name,
+                id: bill.file_id,
+                url: bill.url,
+                upload_date: bill.upload_date.toLocaleDateString()
+            }   
+           }
+           resultArray.push(billObj);
 
-                    // Add the transformed user to the 'users' array
-                }
-            }
-            response.status(200).json(results);
         }
-    });
-}
+        response.status(200).json(resultArray)
+            }},function errorHandler(error){
+                console.log(error)
+                response.status(500).json(error);
+            });
+        
+    }
 
 exports.getBillById = (request, response) => {
     let user = request.user
@@ -176,10 +211,23 @@ exports.getBillById = (request, response) => {
                 for (var status in PaymentStatusEnum) {
                     if (PaymentStatusEnum[status] == bill.paymentStatus) {
                         bill.paymentStatus = status
-                        response.status(200).json(bill);
                         break
                     }
                 }
+                fileService.getFileByBillId(bill.id, function callback(results) {
+                    if (results.length == 0) {
+                        bill.attachment = {}
+                    } else {
+                        bill.attachment = {
+                            filename: results[0].file_name,
+                            id: results[0].id,
+                            url: results[0].url,
+                            upload_date: results[0].upload_date.toLocaleDateString()
+                        }
+                    }
+                    response.status(200).json(bill);
+                })
+
             }
 
         }
@@ -227,7 +275,18 @@ exports.put = (request, response) => {
                                                 const params = [updated_ts, vendor, bill_date, bill_date, amount_due, categoriesString, PaymentStatusEnum[paymentStatus], billId, user.id]
                                                 billService.updateBill(params, function callback(msg) {
                                                     if (msg == 'success') {
-                                                        response.status(200).json({
+                                                        fileService.getFileByBillId(bill.id, function callback(results) {
+                                                            if (results.length == 0) {
+                                                                bill.attachment = {}
+                                                            } else {
+                                                                bill.attachment = {
+                                                                    filename: results[0].file_name,
+                                                                    id: results[0].id,
+                                                                    url: results[0].url,
+                                                                    upload_date: results[0].upload_date.toLocaleDateString()
+                                                                }
+                                                            }
+                                                            response.status(200).json({
                                                                 "id": billId,
                                                                 "created_ts": created_ts,
                                                                 "updated_ts": updated_ts,
@@ -237,7 +296,9 @@ exports.put = (request, response) => {
                                                                 "due_date": due_date,
                                                                 "amount_due": amount_due,
                                                                 "categories": categoriesTemp,
-                                                                "paymentStatus": paymentStatus
+                                                                "paymentStatus": paymentStatus,
+                                                                "attachment": bill.attachment
+                                                            });
                                                         });
                                                     }
                                                 });
@@ -313,12 +374,37 @@ exports.deleteBillById = (request, response) => {
                     message: "Unauthorized access of bill"
                 });
             } else {
-                const params = [billId, user.id]
-                billService.deleteBillById(params, function callback(results) {
-                    console.log(`Deleted ${results.affectedRows} row(s)`);
-                    response.status(204).send();
-                }, function handleError(error) {
-                    throw error
+                fileService.getFileByBillId([billId], function callback(results){
+                    if(results.length == 0){
+                        const params = [billId, user.id];
+                        billService.deleteBillById(params, function callback(results) {
+                            console.log(`Deleted ${results.affectedRows} row(s)`);
+                            response.status(204).send();
+                        }, function handleError(error) {
+                            response.status(500).send('bill');
+                        });
+                    }
+                    else
+                    {
+                        let file = results[0];
+                            fs.unlink(file.url, function (err) {
+                                if (err) {
+                                    response.status(500).send(err);
+                                } else {
+                                    const params = [file.id, user.id, billId]
+                                    fileService.deleteFileById(params, function callback(results) {
+                                        billService.deleteBillById([billId,user.id], function callback(results) {
+                                            console.log(`Deleted ${results.affectedRows} row(s)`);
+                                            response.status(204).send();
+                                        }, function handleError(error) {
+                                            response.status(500).send('bill');
+                                        });
+                                    }, function handleError(error) {
+                                        throw error
+                                    });
+                                }
+                            });
+                    }
                 });
             }
 
