@@ -155,8 +155,8 @@ exports.getBillAttachment = (request, response) => {
                     } else {
                         let file = results[0];
                         if (file.id != fileId) {
-                            response.status(400).json({
-                                message: 'File id for given bill id is not matching'
+                            response.status(404).json({
+                                message: 'No file found with this id'
                             })
                         } else {
                             response.status(200).json({
