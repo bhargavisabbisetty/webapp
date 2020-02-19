@@ -13,19 +13,28 @@ if (process.env.NODE_ENV != 'production') {
   var connection = mysql.createConnection({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE
+    password: process.env.MYSQL_PASSWORD
   });
 
-  connection.connect(function (err) {
+  connection.query('CREATE DATABASE IF NOT EXISTS ??', process.env.MYSQL_DATABASE, function (err, results) {
     if (err) {
-      console.error('error connecting: ' + err.stack);
+      console.log('error in creating database', err);
       return;
     }
-    console.log('connected as id ' + connection.threadId);
-    sql.sqlInit();
+    console.log('created a new database');
+
+    connection.changeUser({
+      database: process.env.MYSQL_DATABASE
+    }, function (err) {
+      if (err) {
+        console.log('error in changing database', err);
+        return;
+      }
+    });
+      console.log('connected as id ' + connection.threadId);
+      sql.sqlInit();
   });
-}
+};
 app.get('/', (req, res) => {
   res.send('CSYE 6225 Assignment 2');
 });
