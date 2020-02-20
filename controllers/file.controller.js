@@ -30,7 +30,8 @@ exports.post = (request, response) => {
     let billId = request.params.id
     let user = request.user;
     const id = uuid();
-    const upload_date = (new Date()).toLocaleDateString();
+    // const upload_date = (new Date()).toLocaleDateString();
+    const upload_date = formatDate(new Date())
     const owner_id = user.id;
     var url = ''
 
@@ -163,7 +164,7 @@ exports.getBillAttachment = (request, response) => {
                                 "file_name": file.file_name,
                                 "id": file.id,
                                 "url": file.url,
-                                "upload_date": file.upload_date.toLocaleDateString()
+                                "upload_date": formatDate(file.upload_date)
                             });
                         }
                     }
@@ -224,4 +225,18 @@ exports.deleteFileOfBill = (request, response) => {
             }
         }
     });
+}
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
 }

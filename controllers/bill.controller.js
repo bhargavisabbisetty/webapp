@@ -175,7 +175,7 @@ exports.getAll = (request, response) => {
                 filename: bill.file_name,
                 id: bill.file_id,
                 url: bill.url,
-                upload_date: bill.upload_date.toLocaleDateString()
+                upload_date: formatDate(bill.upload_date)
             }   
            }
            resultArray.push(billObj);
@@ -222,7 +222,7 @@ exports.getBillById = (request, response) => {
                             filename: results[0].file_name,
                             id: results[0].id,
                             url: results[0].url,
-                            upload_date: results[0].upload_date.toLocaleDateString()
+                            upload_date: formatDate(results[0].upload_date)
                         }
                     }
                     response.status(200).json(bill);
@@ -283,7 +283,7 @@ exports.put = (request, response) => {
                                                                     filename: results[0].file_name,
                                                                     id: results[0].id,
                                                                     url: results[0].url,
-                                                                    upload_date: results[0].upload_date.toLocaleDateString()
+                                                                    upload_date: formatDate(results[0].upload_date)
                                                                 }
                                                             }
                                                             response.status(200).json({
@@ -410,4 +410,18 @@ exports.deleteBillById = (request, response) => {
 
         }
     });
+}
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
 }
