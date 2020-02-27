@@ -23,6 +23,7 @@ uploads/*.pdf
 uploads/*.png
 uploads/*.jpg
 uploads/*.jpeg
+sql_init1.js
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 

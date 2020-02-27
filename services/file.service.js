@@ -4,13 +4,24 @@ const server = require('./../server')
 module.exports = {
     insertFile,
     getFileByBillId,
-    deleteFileById
+    deleteFileById,
+    updateFile
 };
 
 
 
 function insertFile(params, callback) {
     server.connection.query('INSERT INTO filedetails SET ?', params, function (error, results, fields) { 
+        if (error) {
+            callback(error)
+        } else {
+            callback('success')
+        }
+    });
+}
+
+function updateFile(params, callback) {
+    server.connection.query('UPDATE filedetails SET url=?, key_name=? where id = ? and file_owner = ? and bill_id = ?', params, function (error, results, fields) { 
         if (error) {
             callback(error)
         } else {

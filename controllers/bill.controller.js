@@ -387,11 +387,16 @@ exports.deleteBillById = (request, response) => {
                     else
                     {
                         let file = results[0];
-                            fs.unlink(file.url, function (err) {
-                                if (err) {
-                                    response.status(500).send(err);
-                                } else {
-                                    const params = [file.id, user.id, billId]
+                        var params = {
+                            Bucket: process.env.S3_BUCKET_ADDR,
+                            Key: file.key_name 
+                        }
+                        s3.deleteObject(params, function (err, data) {
+                            if (err) {
+                                response.status(400).send(err);
+                            }
+                            else {
+                                const params = [file.id, user.id, billId]
                                     fileService.deleteFileById(params, function callback(results) {
                                         billService.deleteBillById([billId,user.id], function callback(results) {
                                             console.log(`Deleted ${results.affectedRows} row(s)`);
@@ -402,8 +407,8 @@ exports.deleteBillById = (request, response) => {
                                     }, function handleError(error) {
                                         throw error
                                     });
-                                }
-                            });
+                            }
+                        });
                     }
                 });
             }

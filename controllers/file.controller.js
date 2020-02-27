@@ -1,12 +1,19 @@
 var bcrypt = require('bcrypt');
+const AWS = require('aws-sdk');
 const saltRounds = 10
 const server = require('./../server')
 const uuid = require('uuid/v4')
 const Validator = require('./../services/validator')
 const validatorObj = new Validator()
+const aws = require('aws-sdk');
 var fs = require('fs')
 var billService = ''
 var fileService = ''
+let s3 = new aws.S3();
+aws.config.update({
+    region: 'us-east-1'
+});
+const bucket = process.env.S3_BUCKET_ADDR;
 if (process.env.NODE_ENV == 'production') {
     billService = require('./../services/bill.service.mock')
 } else {
@@ -57,7 +64,7 @@ exports.post = (request, response) => {
                     let file = request.files.file;
                     if (file != undefined) {
                         var fileFormat = (file.name).split(".");
-                        url = process.env.FOLDER + fileFormat[0] + '_'+ user.id.substring(1,8) + '_' + billId.substring(1,8) + '_' + Date.now() + '.' + fileFormat[fileFormat.length - 1]
+                        url = fileFormat[0] + '_' + user.id.substring(1, 8) + '_' + billId.substring(1, 8) + '_' + Date.now() + '.' + fileFormat[fileFormat.length - 1]
                         var ext = fileFormat[fileFormat.length - 1]
                         if (ext != 'pdf' && ext != 'jpeg' && ext != 'jpg' && ext != 'png') {
                             response.status(400).json({
@@ -76,12 +83,20 @@ exports.post = (request, response) => {
                                         "md5": file.md5,
                                         "encoding": file.encoding,
                                         "mimetype": file.mimetype,
-                                        "url": url
+                                        "url": url,
+                                        "key_name": url
                                     };
                                     fileService.insertFile(params, function (msg) {
                                         if (msg == 'success') {
-                                            file.mv(url, function (err) {
+                                            // let s3Bucket = new AWS.S3({Bucket: process.env.S3_BUCKET_ADDR});
+                                            var params = {
+                                                Bucket: process.env.S3_BUCKET_ADDR,
+                                                Key: url,
+                                                Body: file.data
+                                            }
+                                            s3.upload(params, function (err, data) {
                                                 if (err) {
+                                                    console.log(err);
                                                     const params = [id, owner_id, billId]
                                                     fileService.deleteFileById(params, function callback(results) {
                                                         console.log(`Deleted ${results.affectedRows} row(s)`);
@@ -92,14 +107,30 @@ exports.post = (request, response) => {
 
 
                                                 } else {
-                                                    response.status(201).json({
-                                                        "file_name": file.name,
-                                                        "id": id,
-                                                        "url": url,
-                                                        "upload_date": upload_date
-                                                    });
+                                                    console.log(data);
+                                                    const params = [data.Location, data.key, id, owner_id, billId]
+                                                    fileService.updateFile(params, function (msg) {
+                                                        if (msg == 'success') {
+                                                            response.status(201).json({
+                                                                "file_name": file.name,
+                                                                "id": id,
+                                                                "url": data.Location,
+                                                                "upload_date": upload_date
+                                                            });
+                                                        } else {
+                                                            const params = [id, owner_id, billId]
+                                                            fileService.deleteFileById(params, function callback(results) {
+                                                                console.log(`Deleted ${results.affectedRows} row(s)`);
+                                                                response.status(500).send(err);
+                                                            }, function handleError(error) {
+                                                                return response.status(500).send(error);
+                                                            })
+                                                        }
+
+                                                    })
                                                 }
-                                            });
+                                            })
+
 
                                         } else {
                                             response.status(500).json(msg)
@@ -113,9 +144,7 @@ exports.post = (request, response) => {
                                 }
                             });
                         }
-                    }
-                    else
-                    {
+                    } else {
                         response.status(400).json({
                             message: "Bad request"
                         });
@@ -206,10 +235,16 @@ exports.deleteFileOfBill = (request, response) => {
                                 message: 'File id for given bill id is not matching'
                             })
                         } else {
-                            fs.unlink(file.url, function (err) {
+                            var params = {
+                                Bucket: process.env.S3_BUCKET_ADDR,
+                                Key: file.key_name
+                            };
+
+                            s3.deleteObject(params, function (err, data) {
                                 if (err) {
-                                    response.status(500).send(err);
-                                } else {
+                                    response.status(400).send(err);
+                                }
+                                else {
                                     const params = [fileId, user.id, billId]
                                     fileService.deleteFileById(params, function callback(results) {
                                         console.log(`Deleted ${results.affectedRows} row(s)`);
@@ -233,9 +268,9 @@ function formatDate(date) {
         day = '' + d.getDate(),
         year = d.getFullYear();
 
-    if (month.length < 2) 
+    if (month.length < 2)
         month = '0' + month;
-    if (day.length < 2) 
+    if (day.length < 2)
         day = '0' + day;
 
     return [year, month, day].join('-');
