@@ -1,5 +1,6 @@
 var bcrypt = require('bcrypt');
 const saltRounds = 10
+const aws = require('aws-sdk');
 const server = require('./../server')
 const uuid = require('uuid/v4')
 const Validator = require('./../services/validator')
@@ -391,6 +392,7 @@ exports.deleteBillById = (request, response) => {
                             Bucket: process.env.S3_BUCKET_ADDR,
                             Key: file.key_name 
                         }
+                        let s3 = new aws.S3();
                         s3.deleteObject(params, function (err, data) {
                             if (err) {
                                 response.status(400).send(err);
