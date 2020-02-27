@@ -32,7 +32,7 @@ function sqlInit() {
         }
     });
     server.connection.query('create table IF NOT EXISTS filedetails'+ 
-    '( file_name varchar(225) not null,id varchar(250) not null,url varchar(225) not null, '+ 
+    '( file_name varchar(225) not null,id varchar(250) not null,url varchar(225) not null, key_name varchar(225) not null, '+ 
     'upload_date date not null, file_owner varchar(225) not null, bill_id varchar(225) not null,'+
     'size int not null, md5 varchar(225) not null, encoding varchar(225) not null, mimetype varchar(225) not null, '+
     'primary key(id), foreign key(file_owner) references userdetails(id), foreign key(bill_id) references billdetails(id) )', function (error, results, fields) {
