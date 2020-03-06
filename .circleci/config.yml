@@ -9,12 +9,21 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:10
+      - image: circleci/python:3.6.8-jessie
 
     working_directory: ~/repo
 
     steps:
       - checkout
-    #  - run: 
+      - run:
+          name: Install packages
+          command: sudo apt-get update && sudo apt-get install wget zip unzip -y
+      - run:
+          name: Install python
+          command: sudo apt-get install python-pip
+      - run:
+          name: Install awscli
+          command: sudo pip install awscli
       - run:
           name: Hello World
           command: echo "Hello World"
@@ -33,22 +42,56 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: npm test
+      - run:
+          name: Zip Artifact
+          command: |
+            echo "Hello the current build number is ${CIRCLE_BUILD_NUM}"
+            aws configure set default.region us-east-1
+            pwd
+            ls -al
+            mkdir -p codedeploy_artifact
+            cp ./codedeploy/*.sh .
+            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp ./codedeploy/*.sh *.yml
+            ls -al
+            mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
+            ls -al
+            pwd
+            cd codedeploy_artifact
+            ls -al
+            pwd
+            cd ..
+            pwd
+            ls -al
+
+      - run:
+          name: Upload Artifact to S3
+          command: |
+            aws s3 cp codedeploy_artifact/csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://{S3_BUCKET_ADDR}/deployments/csye6225-web-app-${CIRCLE_BUILD_NUM}.zip --region us-east-1
 
   build:
     docker:
       # specify the version you desire here
       - image: circleci/node:10
+      - image: circleci/python:3.6.8-jessie
       
     working_directory: ~/repo
 
     steps:
       - checkout
-    #  - run: 
+      - run:
+          name: Install packages
+          command: sudo apt-get update && sudo apt-get install wget zip unzip -y
+      - run:
+          name: Install python
+          command: sudo apt-get install python-pip
+      - run:
+          name: Install awscli
+          command: sudo pip install awscli
       - run:
           name: Hello World
           command: echo "Hello World"
 
-     # Download and cache dependencies
+       # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
@@ -62,6 +105,32 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: npm test
+
+      - run:
+          name: Zip Artifact
+          command: |
+            echo "Hello the current build number is ${CIRCLE_BUILD_NUM}"
+            aws configure set default.region us-east-1
+            pwd
+            ls -al
+            mkdir -p codedeploy_artifact
+            cp ./codedeploy/*.sh .
+            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp ./codedeploy/*.sh *.yml
+            ls -al
+            mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
+            ls -al
+            pwd
+            cd codedeploy_artifact
+            ls -al
+            pwd
+            cd ..
+            pwd
+            ls -al
+
+      - run:
+          name: Upload Artifact to S3
+          command: |
+            aws s3 cp codedeploy_artifact/csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://${S3_BUCKET_ADDR}/deployments/csye6225-web-app-${CIRCLE_BUILD_NUM}.zip --region us-east-1
       
     
 

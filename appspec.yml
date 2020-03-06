@@ -1,0 +1,19 @@
+version: 0.0
+os: linux
+
+files:             
+  - source: /
+    destination: /home/ubuntu/ccwebapp
+hooks:
+  BeforeInstall:
+   - location: ./codedeploy/application_stop.sh
+     timeout: 180
+     runas: root
+  AfterInstall:
+   - location: ./codedeploy/afterInstall.sh
+     timeout: 180
+     runas: root
+  ApplicationStart:
+   - location: ./codedeploy/application_start.sh
+     timeout: 180
+     runas: root
