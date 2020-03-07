@@ -51,7 +51,7 @@ jobs:
             ls -al
             mkdir -p codedeploy_artifact
             cp ./codedeploy/*.sh .
-            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip ./codedeploy/*.sh appspec.yml ./webapp
+            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip ./codedeploy/*.sh appspec.yml ./../webapp
             ls -al
             mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
             ls -al
