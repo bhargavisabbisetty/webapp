@@ -1,3 +1,3 @@
 ls
-cd /home/ubuntu/repo
+cd /home/circleci/repo
 sudo pm2 start server.js
