@@ -1,2 +1,4 @@
-cd /home/ubuntu/webapp
+ls
+pwd
+cd /home/ubuntu/repo
 npm install
