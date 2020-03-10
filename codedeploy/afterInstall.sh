@@ -1,4 +1,6 @@
 ls
 pwd
-cd /home/circleci/repo
+cd /home/ubuntu
+ls
+cd repo
 npm install

@@ -3,7 +3,7 @@ os: linux
 
 files:             
   - source: /
-    destination: /home/ubuntu/ccwebapp
+    destination: /home/ubuntu
 hooks:
   BeforeInstall:
    - location: ./codedeploy/application_stop.sh

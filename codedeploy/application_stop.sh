@@ -1,6 +1,5 @@
 pwd
 ls
-cd /home/circleci/repo
+cd /home/ubuntu
 ls
 pwd
-sudo pm2 stop server.js
