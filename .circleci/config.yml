@@ -50,9 +50,19 @@ jobs:
             pwd
             ls -al
             mkdir -p codedeploy_artifact
-            cp ./codedeploy/*.sh .
-            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip ./codedeploy/*.sh appspec.yml ./../repo
-            ls -al
+            pwd
+            cd ..
+            mkdir -p webapp
+            cd webapp
+            pwd
+            cp -r ./../repo/* . 
+            ls -la
+            cd ..
+            echo "done"
+            ls -la
+            cd repo
+            echo "inside repo"
+            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip ./../webapp ./codedeploy *.yml
             mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
             ls -al
             pwd
@@ -120,9 +130,12 @@ jobs:
             pwd
             ls -al
             mkdir -p codedeploy_artifact
-            cp ./codedeploy/*.sh .
-            zip -r webapp.zip ./../repo ./codedeploy/*.sh *.yml
-            zip csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp.zip
+            mkdir webapp
+            cd webapp
+            cp ./../../repo . 
+            ls -la
+            cd ..
+            zip csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp ./codedeploy/*.sh *.yml
             ls -al
             mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
             ls -al
