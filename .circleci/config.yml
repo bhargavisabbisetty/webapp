@@ -52,19 +52,10 @@ jobs:
             ls -al
             mkdir -p codedeploy_artifact
             pwd
-            cd ..
-            mkdir -p webapp
-            cd webapp
-            pwd
-            cp -r ./../repo/* . 
-            ls -la
-            zip -r webapp.zip .
-            cd ..
             echo "done"
             ls -la
-            cd repo
-            echo "inside repo"
-            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip ./../webapp/webapp.zip ./codedeploy *.yml
+            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip . -x ./codedeploy *.yml
+            zip -rv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip ./codedeploy *.yml
             mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
             ls -al
             pwd
