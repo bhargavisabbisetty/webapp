@@ -54,8 +54,8 @@ jobs:
             pwd
             echo "done"
             ls -la
-            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip . -x ./codedeploy *.yml
-            zip -rv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip ./codedeploy *.yml
+            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip . 
+            # zip -rv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip ./codedeploy *.yml
             mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
             ls -al
             pwd
