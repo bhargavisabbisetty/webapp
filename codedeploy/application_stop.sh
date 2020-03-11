@@ -5,7 +5,6 @@ echo "ls -la"
 cd /home/ubuntu
 echo "home/ubuntu"
 ls -la
-cd webapp
-rm -rf .
+rm -rf /webapp/*
 echo "ls -la"
 pwd

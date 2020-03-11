@@ -1,6 +1,6 @@
-ls
+ls -la
 pwd
 cd /home/ubuntu
-ls
+ls -la
 cd webapp
 npm install
