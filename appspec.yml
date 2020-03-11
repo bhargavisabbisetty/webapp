@@ -8,12 +8,12 @@ hooks:
   BeforeInstall:
    - location: ./codedeploy/application_stop.sh
      timeout: 700
-     runas: root
+     runas: ubuntu
   AfterInstall:
    - location: ./codedeploy/afterInstall.sh
      timeout: 700
-     runas: root
+     runas: ubuntu
   ApplicationStart:
    - location: ./codedeploy/application_start.sh
      timeout: 700
-     runas: root
+     runas: ubuntu
