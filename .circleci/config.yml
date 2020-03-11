@@ -58,12 +58,13 @@ jobs:
             pwd
             cp -r ./../repo/* . 
             ls -la
+            zip -r webapp.zip .
             cd ..
             echo "done"
             ls -la
             cd repo
             echo "inside repo"
-            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip ./../webapp ./codedeploy *.yml
+            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip ./../webapp/webapp.zip ./codedeploy *.yml
             mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
             ls -al
             pwd
