@@ -1,6 +1,8 @@
 ls -la
 pwd
 cd /home/ubuntu
-ls -la
+pwd
 cd webapp
+pwd
+echo "inside webapp"
 npm install
