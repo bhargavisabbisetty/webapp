@@ -5,4 +5,4 @@ pwd
 cd webapp
 pwd
 echo "inside webapp"
-# npm install
+npm install

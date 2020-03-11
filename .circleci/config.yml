@@ -42,7 +42,7 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: npm test
-      # - run: rm -rf node_modules/
+      - run: rm -rf node_modules/
       - run:
           name: Zip Artifact
           command: |
