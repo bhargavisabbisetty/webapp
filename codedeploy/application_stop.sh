@@ -1,5 +1,5 @@
 pwd
 ls
 cd /home/ubuntu
-ls
+ls -la
 pwd

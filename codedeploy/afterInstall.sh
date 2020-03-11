@@ -2,5 +2,5 @@ ls
 pwd
 cd /home/ubuntu
 ls
-cd repo
+cd webapp
 npm install

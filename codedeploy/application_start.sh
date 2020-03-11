@@ -2,5 +2,5 @@ ls
 cd /home/ubuntu
 ls
 pwd
-cd repo
+cd webapp
 sudo pm2 start server.js
