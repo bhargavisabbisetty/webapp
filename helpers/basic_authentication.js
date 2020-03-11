@@ -15,7 +15,7 @@ module.exports = basicAuth;
  */
 function basicAuth(req, res, next) {
     // make authenticate path public
-    if (req.path === '/v1/user') {
+    if (req.path === '/version/user') {
         return next();
     }
 
