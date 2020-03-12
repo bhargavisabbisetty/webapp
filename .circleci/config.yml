@@ -42,7 +42,7 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: npm test
-      
+
   build:
     docker:
       # specify the version you desire here
@@ -80,7 +80,7 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: npm test
-
+      - run: rm -rf node_modules/
       - run:
           name: Zip Artifact
           command: |
@@ -89,13 +89,11 @@ jobs:
             pwd
             ls -al
             mkdir -p codedeploy_artifact
-            mkdir webapp
-            cd webapp
-            cp ./../../repo . 
+            pwd
+            echo "done"
             ls -la
-            cd ..
-            zip csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp ./codedeploy/*.sh *.yml
-            ls -al
+            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip . 
+            # zip -rv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip ./codedeploy *.yml
             mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
             ls -al
             pwd
