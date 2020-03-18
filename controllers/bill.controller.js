@@ -425,7 +425,7 @@ exports.deleteBillById = (request, response) => {
                                 sdc.timing('S3fileDelete.timer', S3timer)
                                 const params = [file.id, user.id, billId]
                                 fileService.deleteFileById(params, function callback(results) {
-                                    var DBTimer2 = new Date()
+                                    var DBtimer2 = new Date()
                                     billService.deleteBillById([billId, user.id], function callback(results) {
                                         sdc.timing('DBbillDelete.timer', DBtimer2)
                                         logger.info(`Deleted ${results.affectedRows} row(s)`);
