@@ -6,11 +6,10 @@ const validatorObj = new Validator()
 const logger = require('../config/winston')
 const sdc = require('../config/statsd-client')
 var userService = ''
-if(process.env.NODE_ENV == 'production'){
-userService = require('./../services/user.service.mock')
-}
-else{
-userService = require('./../services/user.service');
+if (process.env.NODE_ENV == 'production') {
+    userService = require('./../services/user.service.mock')
+} else {
+    userService = require('./../services/user.service');
 }
 /**
  * 
@@ -19,6 +18,7 @@ userService = require('./../services/user.service');
  */
 exports.post = (request, response) => {
     sdc.increment('userPost.counter');
+    var timer = new Date();
     const id = uuid();
     const first_name = request.body.first_name;
     const last_name = request.body.last_name;
@@ -31,7 +31,7 @@ exports.post = (request, response) => {
         if (first_name.length > 0 && last_name.length > 0 && password.length > 0 && email_address.length > 0) {
             if (validatorObj.checkEmail(email_address)) {
                 if (validatorObj.checkPassword(password)) {
-                    userService.isUserExist(email_address, function(msg){
+                    userService.isUserExist(email_address, function (msg) {
                         if (msg) {
                             console.log("User Email exists in the database..!!")
                             logger.info("Bad Request : User Email exists in the database..!!");
@@ -56,16 +56,18 @@ exports.post = (request, response) => {
                                     account_updated: account_updated
                                 };
                                 // console.log(params)
+                                var DBtimer = new Date();
                                 userService.insertUser(params, function (msg) {
                                     if (msg == 'success') {
                                         logger.info("successfully created user" + first_name)
+                                        sdc.timing('DBuserPost.timer', DBtimer)
                                         response.status(201).json({
-                                                "id": id,
-                                                "first_name": first_name,
-                                                "last_name": last_name,
-                                                email_address: email_address,
-                                                "account_created": account_created,
-                                                "account_updated": account_updated
+                                            "id": id,
+                                            "first_name": first_name,
+                                            "last_name": last_name,
+                                            email_address: email_address,
+                                            "account_created": account_created,
+                                            "account_updated": account_updated
                                         });
                                     } else {
                                         logger.info("Bad Request : User Email exists..!!")
@@ -101,6 +103,7 @@ exports.post = (request, response) => {
             message: "Bad Request : Please enter valid input"
         });
     }
+    sdc.timing('userPost.timer', timer)
 }
 
 /**
@@ -110,16 +113,20 @@ exports.post = (request, response) => {
  */
 exports.get = (request, response) => {
     sdc.increment('userGet.counter');
+    var timer = new Date();
+    var DBtimer = new Date();
     let user = request.user
     logger.info("user details with id " + user.id + " successfully retrieved")
+    sdc.timing('DBuserGet.timer', DBtimer)
     response.status(200).json({
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email_address: user.email_address,
-            account_created: user.account_created,
-            account_updated: user.account_updated
-        });
+        id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email_address: user.email_address,
+        account_created: user.account_created,
+        account_updated: user.account_updated
+    });
+    sdc.timing('userGet.timer', timer)
 }
 
 /**
@@ -129,6 +136,7 @@ exports.get = (request, response) => {
  */
 exports.put = (request, response) => {
     sdc.increment('userPut.counter');
+    var timer = new Date()
     const {
         first_name,
         last_name,
@@ -148,13 +156,17 @@ exports.put = (request, response) => {
                         }
                         const account_updated = new Date()
                         const params = [first_name, last_name, hash, account_updated, email_address];
+                        var DBtimer = new Date()
                         userService.updateUser(params, function (msg) {
                             if (msg == 'success') {
-                                logger.info("successfully updated user details "+ email_address)
+                                logger.info("successfully updated user details " + email_address)
+                                sdc.timing('DBuserPut.timer', DBtimer)
                                 response.status(204).send();
                             } else {
                                 logger.err('sql error of update')
-                                response.status(400).json({message: msg})
+                                response.status(400).json({
+                                    message: msg
+                                })
                             }
                         })
                     });
@@ -182,4 +194,5 @@ exports.put = (request, response) => {
             message: "Bad Request : Please give valid input"
         });
     }
+    sdc.timing('userPut.timer', timer)
 }
