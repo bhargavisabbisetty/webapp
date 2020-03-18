@@ -7,6 +7,8 @@ const Validator = require('./../services/validator')
 const validatorObj = new Validator()
 var billService = ''
 var fileService = ''
+const logger = require('../config/winston')
+const sdc = require('../config/statsd-client')
 var fs = require('fs')
 if (process.env.NODE_ENV == 'production') {
     fileService = require('./../services/file.service.mock')
@@ -34,6 +36,7 @@ Object.freeze(PaymentStatusEnum);
  */
 
 exports.post = (request, response) => {
+    sdc.increment('billPost.counter');
     let user = request.user;
     const id = uuid();
     const created_ts = new Date();
@@ -69,6 +72,7 @@ exports.post = (request, response) => {
                                     };
                                     billService.insertBill(params, function (msg) {
                                         if (msg == 'success') {
+                                            logger.info("Successfully created bill")
                                             response.status(201).json({
                                                 "id": id,
                                                 "created_ts": created_ts,
@@ -85,49 +89,49 @@ exports.post = (request, response) => {
                                         }
                                     });
                                 } else {
-                                    console.log("Invalid Payment Status")
+                                    logger.info("Invalid Payment Status")
                                     response.status(400).json({
                                         message: "Bad Request : Invalid Payment Status"
                                     })
                                 }
                             } else {
-                                console.log("Amount should be at least 0.01");
+                                logger.info("Amount should be at least 0.01");
                                 response.status(400).json({
                                     message: "Bad Request : Amount should be at least 0.01"
                                 });
                             }
                         } else {
-                            console.log("Invalid input for amount");
+                            logger.info("Invalid input for amount");
                             response.status(400).json({
                                 message: "Bad Request : Invalid input for amount"
                             });
                         }
                     } else {
-                        console.log("Invalid Dates");
+                        logger.info("Invalid Dates");
                         response.status(400).json({
                             message: "Bad Request : Invalid Dates"
                         });
                     }
                 } else {
-                    console.log("Invalid Due Date");
+                    logger.info("Invalid Due Date");
                     response.status(400).json({
                         message: "Bad Request : Invalid Due Date"
                     });
                 }
             } else {
-                console.log("Invalid Bill Date");
+                logger.info("Invalid Bill Date");
                 response.status(400).json({
                     message: "Bad Request : Invalid Bill Date"
                 });
             }
         } else {
-            console.log("Please enter all details");
+            logger.info("Please enter all details");
             response.status(400).json({
                 message: "Bad Request : Please enter all details"
             });
         }
     } else {
-        console.log("Please enter valid input");
+        logger.info("Please enter valid input");
         response.status(400).json({
             message: "Bad Request : Please enter valid input"
         });
@@ -136,11 +140,12 @@ exports.post = (request, response) => {
 }
 
 exports.getAll = (request, response) => {
+    sdc.increment('billGetAll.counter');
     let user = request.user
     billService.getBillsWithAttachmentsBasedOnUserId([user.id],function callback(results) {
       console.log('hi')
         if (results.length == 0) {
-            console.log("No bills are available");
+            logger.info("No bills are available");
             response.status(200).json({
                 message: "No bills are available",
                 results
@@ -182,28 +187,30 @@ exports.getAll = (request, response) => {
            resultArray.push(billObj);
 
         }
+        logger.info("Retrieved all bills")
         response.status(200).json(resultArray)
             }},function errorHandler(error){
-                console.log(error)
+                logger.error(error)
                 response.status(500).json(error);
             });
         
     }
 
 exports.getBillById = (request, response) => {
+    sdc.increment('billGetById.counter');
     let user = request.user
     let billId = request.params.id
 
     billService.getBillById(billId, function callback(results) {
         if (results.length == 0) {
-            console.log("No bill found with this id");
+            logger.info("No bill found with this id");
             response.status(404).json({
                 message: "No bill found with this id"
             });
         } else {
             let bill = results[0]
             if (bill.owner_id != user.id) {
-                console.log("Unauthorized access of bill");
+                logger.info("Unauthorized access of bill");
                 response.status(401).json({
                     message: "Unauthorized access of bill"
                 });
@@ -226,6 +233,7 @@ exports.getBillById = (request, response) => {
                             upload_date: formatDate(results[0].upload_date)
                         }
                     }
+                    logger.info("Successfully retrieved bill details")
                     response.status(200).json(bill);
                 })
 
@@ -236,12 +244,13 @@ exports.getBillById = (request, response) => {
 }
 
 exports.put = (request, response) => {
+    sdc.increment('billPut.counter');
     let user = request.user
     let billId = request.params.id
 
     billService.getBillById(billId, function callback(results) {
         if (results.length == 0) {
-            console.log("No bill found with this id");
+            logger.info("No bill found with this id");
             response.status(404).json({
                 message: "No bill found with this id",
                 results
@@ -249,7 +258,7 @@ exports.put = (request, response) => {
         } else {
             let bill = results[0]
             if (bill.owner_id != user.id) {
-                console.log("Unauthorized access of bill");
+                logger.info("Unauthorized access of bill");
                 response.status(401).json({
                     message: "Unauthorized access of bill"
                 });
@@ -287,6 +296,7 @@ exports.put = (request, response) => {
                                                                     upload_date: formatDate(results[0].upload_date)
                                                                 }
                                                             }
+                                                            logger.info("bill details with id " + billId)
                                                             response.status(200).json({
                                                                 "id": billId,
                                                                 "created_ts": created_ts,
@@ -304,49 +314,49 @@ exports.put = (request, response) => {
                                                     }
                                                 });
                                             } else {
-                                                console.log("Invalid Payment Status")
+                                                logger.info("Invalid Payment Status")
                                                 response.status(400).json({
                                                     message: "Bad Request : Invalid Payment Status"
                                                 })
                                             }
                                         } else {
-                                            console.log("Amount should be at least 0.01");
+                                            logger.info("Amount should be at least 0.01");
                                             response.status(400).json({
                                                 message: "Bad Request : Amount should be at least 0.01"
                                             });
                                         }
                                     } else {
-                                        console.log("Invalid input for amount");
+                                        logger.info("Invalid input for amount");
                                         response.status(400).json({
                                             message: "Bad Request : Invalid input for amount"
                                         });
                                     }
                                 } else {
-                                    console.log("Invalid Dates");
+                                    logger.info("Invalid Dates");
                                     response.status(400).json({
                                         message: "Bad Request : Invalid Dates"
                                     });
                                 }
                             } else {
-                                console.log("Invalid Due Date");
+                                logger.info("Invalid Due Date");
                                 response.status(400).json({
                                     message: "Bad Request : Invalid Due Date"
                                 });
                             }
                         } else {
-                            console.log("Invalid Bill Date");
+                            logger.info("Invalid Bill Date");
                             response.status(400).json({
                                 message: "Bad Request : Invalid Bill Date"
                             });
                         }
                     } else {
-                        console.log("Please enter all details");
+                        logger.info("Please enter all details");
                         response.status(400).json({
                             message: "Bad Request : Please enter all details"
                         });
                     }
                 } else {
-                    console.log("Please enter valid input");
+                    logger.info("Please enter valid input");
                     response.status(400).json({
                         message: "Bad Request : Please enter valid input"
                     });
@@ -358,19 +368,20 @@ exports.put = (request, response) => {
 }
 
 exports.deleteBillById = (request, response) => {
+    sdc.increment('billDeleteById.counter');
     let user = request.user
     let billId = request.params.id
 
     billService.getBillById(billId, function callback(results) {
         if (results.length == 0) {
-            console.log("No bill found with this id");
+            logger.info("No bill found with this id");
             response.status(404).json({
                 message: "No bill found with this id"
             });
         } else {
             let bill = results[0]
             if (bill.owner_id != user.id) {
-                console.log("Unauthorized access of bill");
+                logger.info("Unauthorized access of bill");
                 response.status(401).json({
                     message: "Unauthorized access of bill"
                 });
@@ -379,9 +390,10 @@ exports.deleteBillById = (request, response) => {
                     if(results.length == 0){
                         const params = [billId, user.id];
                         billService.deleteBillById(params, function callback(results) {
-                            console.log(`Deleted ${results.affectedRows} row(s)`);
+                            logger.info(`Deleted ${results.affectedRows} row(s)`);
                             response.status(204).send();
                         }, function handleError(error) {
+                            logger.error(error)
                             response.status(500).send('bill');
                         });
                     }
@@ -395,19 +407,22 @@ exports.deleteBillById = (request, response) => {
                         let s3 = new aws.S3();
                         s3.deleteObject(params, function (err, data) {
                             if (err) {
+                                logger.error(err);
                                 response.status(400).send(err);
                             }
                             else {
                                 const params = [file.id, user.id, billId]
                                     fileService.deleteFileById(params, function callback(results) {
                                         billService.deleteBillById([billId,user.id], function callback(results) {
-                                            console.log(`Deleted ${results.affectedRows} row(s)`);
+                                            logger.info(`Deleted ${results.affectedRows} row(s)`);
                                             response.status(204).send();
                                         }, function handleError(error) {
+                                            logger.error(error)
                                             response.status(500).send('bill');
                                         });
                                     }, function handleError(error) {
-                                        throw error
+                                        logger.error(error)
+                                        response.status(500).send('file');
                                     });
                             }
                         });
