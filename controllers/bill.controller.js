@@ -446,7 +446,7 @@ exports.deleteBillById = (request, response) => {
 
         }
     });
-    sdc.timing('billDelete.timer', DBtimer)
+    sdc.timing('billDelete.timer', timer)
 }
 
 function formatDate(date) {
