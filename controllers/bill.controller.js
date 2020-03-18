@@ -306,6 +306,7 @@ exports.put = (request, response) => {
                                                                 }
                                                             }
                                                             logger.info("bill details with id " + billId)
+                                                            sdc.timing('billPut.timer', timer)
                                                             response.status(200).json({
                                                                 "id": billId,
                                                                 "created_ts": created_ts,
@@ -374,7 +375,6 @@ exports.put = (request, response) => {
 
         }
     });
-    sdc.timing('billPut.timer', timer)
 }
 
 exports.deleteBillById = (request, response) => {

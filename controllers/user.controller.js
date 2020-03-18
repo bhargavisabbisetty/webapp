@@ -159,6 +159,7 @@ exports.put = (request, response) => {
                         var DBtimer = new Date()
                         userService.updateUser(params, function (msg) {
                             if (msg == 'success') {
+                                sdc.timing('userPut.timer', timer)
                                 logger.info("successfully updated user details " + email_address)
                                 sdc.timing('DBuserPut.timer', DBtimer)
                                 response.status(204).send();
@@ -194,5 +195,4 @@ exports.put = (request, response) => {
             message: "Bad Request : Please give valid input"
         });
     }
-    sdc.timing('userPut.timer', timer)
 }
