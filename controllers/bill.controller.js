@@ -37,6 +37,7 @@ Object.freeze(PaymentStatusEnum);
 
 exports.post = (request, response) => {
     sdc.increment('billPost.counter');
+    var timer = new Date()
     let user = request.user;
     const id = uuid();
     const created_ts = new Date();
@@ -70,9 +71,11 @@ exports.post = (request, response) => {
                                         "categories": categoriesString,
                                         "paymentStatus": PaymentStatusEnum[paymentStatus]
                                     };
+                                    var DBtimer = new Date()
                                     billService.insertBill(params, function (msg) {
                                         if (msg == 'success') {
                                             logger.info("Successfully created bill")
+                                            sdc.timing('DBbillPost.timer', DBtimer)
                                             response.status(201).json({
                                                 "id": id,
                                                 "created_ts": created_ts,
@@ -136,71 +139,73 @@ exports.post = (request, response) => {
             message: "Bad Request : Please enter valid input"
         });
     }
-
+    sdc.timing('billPost.timer', timer)
 }
 
 exports.getAll = (request, response) => {
     sdc.increment('billGetAll.counter');
+    var timer = new Date()
     let user = request.user
-    billService.getBillsWithAttachmentsBasedOnUserId([user.id],function callback(results) {
-      console.log('hi')
+    var DBtimer = new Date()
+    billService.getBillsWithAttachmentsBasedOnUserId([user.id], function callback(results) {
+        console.log('hi')
         if (results.length == 0) {
             logger.info("No bills are available");
             response.status(200).json({
                 message: "No bills are available",
                 results
             });
-        } 
-        else{    
-            let resultArray = [];    
-        for (i in results){
-            let bill = results[i];
-           let billObj = {};
-           billObj.id = bill.id;
-           billObj.created_ts = bill.created_ts;
-           billObj.updated_ts = bill.updated_ts;
-           billObj.owner_id = bill.owner_id;
-           billObj.vendor = bill.vendor;
-           billObj.bill_date = bill.bill_date;
-           billObj.due_date = bill.due_date;
-           billObj.amount_due = bill.amount_due;
-           billObj.categories = bill.categories.split(",")
-           for (var status in PaymentStatusEnum) {
-               if (PaymentStatusEnum[status] == bill.paymentStatus) {
-                   billObj.paymentStatus = status
-                   break
-               }
-           }
-           if(bill.file_id == null)
-           {
-               billObj.attachment = {}
-           }
-           else
-           {
-            billObj.attachment = {
-                filename: bill.file_name,
-                id: bill.file_id,
-                url: bill.url,
-                upload_date: formatDate(bill.upload_date)
-            }   
-           }
-           resultArray.push(billObj);
+        } else {
+            let resultArray = [];
+            for (i in results) {
+                let bill = results[i];
+                let billObj = {};
+                billObj.id = bill.id;
+                billObj.created_ts = bill.created_ts;
+                billObj.updated_ts = bill.updated_ts;
+                billObj.owner_id = bill.owner_id;
+                billObj.vendor = bill.vendor;
+                billObj.bill_date = bill.bill_date;
+                billObj.due_date = bill.due_date;
+                billObj.amount_due = bill.amount_due;
+                billObj.categories = bill.categories.split(",")
+                for (var status in PaymentStatusEnum) {
+                    if (PaymentStatusEnum[status] == bill.paymentStatus) {
+                        billObj.paymentStatus = status
+                        break
+                    }
+                }
+                if (bill.file_id == null) {
+                    billObj.attachment = {}
+                } else {
+                    billObj.attachment = {
+                        filename: bill.file_name,
+                        id: bill.file_id,
+                        url: bill.url,
+                        upload_date: formatDate(bill.upload_date)
+                    }
+                }
+                resultArray.push(billObj);
 
+            }
+            sdc.timing('DBbillGetAll.timer', DBtimer)
+            logger.info("Retrieved all bills")
+            response.status(200).json(resultArray)
         }
-        logger.info("Retrieved all bills")
-        response.status(200).json(resultArray)
-            }},function errorHandler(error){
-                logger.error(error)
-                response.status(500).json(error);
-            });
-        
-    }
+    }, function errorHandler(error) {
+        logger.error(error)
+        response.status(500).json(error);
+    });
+    sdc.timing('billGetAll.timer', timer)
+
+}
 
 exports.getBillById = (request, response) => {
     sdc.increment('billGetById.counter');
+    var timer = new Date()
     let user = request.user
     let billId = request.params.id
-
+    var DBtimer = new Date()
     billService.getBillById(billId, function callback(results) {
         if (results.length == 0) {
             logger.info("No bill found with this id");
@@ -233,6 +238,7 @@ exports.getBillById = (request, response) => {
                             upload_date: formatDate(results[0].upload_date)
                         }
                     }
+                    sdc.timing('DBbillGet.timer', DBtimer)
                     logger.info("Successfully retrieved bill details")
                     response.status(200).json(bill);
                 })
@@ -241,13 +247,14 @@ exports.getBillById = (request, response) => {
 
         }
     });
+    sdc.timing('billGet.timer', timer)
 }
 
 exports.put = (request, response) => {
     sdc.increment('billPut.counter');
+    var timer = new Date()
     let user = request.user
     let billId = request.params.id
-
     billService.getBillById(billId, function callback(results) {
         if (results.length == 0) {
             logger.info("No bill found with this id");
@@ -283,8 +290,10 @@ exports.put = (request, response) => {
                                             const categoriesString = [...categoriesTemp].join(',');
                                             if (validatorObj.isValidStatus(paymentStatus, PaymentStatusEnum)) {
                                                 const params = [updated_ts, vendor, bill_date, bill_date, amount_due, categoriesString, PaymentStatusEnum[paymentStatus], billId, user.id]
+                                                var DBtimer = new Date()
                                                 billService.updateBill(params, function callback(msg) {
                                                     if (msg == 'success') {
+                                                        sdc.timing('DBbillPut.timer', DBtimer)
                                                         fileService.getFileByBillId(bill.id, function callback(results) {
                                                             if (results.length == 0) {
                                                                 bill.attachment = {}
@@ -365,10 +374,12 @@ exports.put = (request, response) => {
 
         }
     });
+    sdc.timing('billPut.timer', timer)
 }
 
 exports.deleteBillById = (request, response) => {
     sdc.increment('billDeleteById.counter');
+    var timer = new Date()
     let user = request.user
     let billId = request.params.id
 
@@ -386,44 +397,47 @@ exports.deleteBillById = (request, response) => {
                     message: "Unauthorized access of bill"
                 });
             } else {
-                fileService.getFileByBillId([billId], function callback(results){
-                    if(results.length == 0){
+                fileService.getFileByBillId([billId], function callback(results) {
+                    if (results.length == 0) {
                         const params = [billId, user.id];
+                        var DBtimer1 = new Date()
                         billService.deleteBillById(params, function callback(results) {
+                            sdc.timing('DBbillDelete.timer', DBtimer1)
                             logger.info(`Deleted ${results.affectedRows} row(s)`);
                             response.status(204).send();
                         }, function handleError(error) {
                             logger.error(error)
                             response.status(500).send('bill');
                         });
-                    }
-                    else
-                    {
+                    } else {
                         let file = results[0];
                         var params = {
                             Bucket: process.env.S3_BUCKET_ADDR,
-                            Key: file.key_name 
+                            Key: file.key_name
                         }
+                        var S3timer = new Date()
                         let s3 = new aws.S3();
                         s3.deleteObject(params, function (err, data) {
                             if (err) {
                                 logger.error(err);
                                 response.status(400).send(err);
-                            }
-                            else {
+                            } else {
+                                sdc.timing('S3fileDelete.timer', S3timer)
                                 const params = [file.id, user.id, billId]
-                                    fileService.deleteFileById(params, function callback(results) {
-                                        billService.deleteBillById([billId,user.id], function callback(results) {
-                                            logger.info(`Deleted ${results.affectedRows} row(s)`);
-                                            response.status(204).send();
-                                        }, function handleError(error) {
-                                            logger.error(error)
-                                            response.status(500).send('bill');
-                                        });
+                                fileService.deleteFileById(params, function callback(results) {
+                                    var DBTimer2 = new Date()
+                                    billService.deleteBillById([billId, user.id], function callback(results) {
+                                        sdc.timing('DBbillDelete.timer', DBtimer2)
+                                        logger.info(`Deleted ${results.affectedRows} row(s)`);
+                                        response.status(204).send();
                                     }, function handleError(error) {
                                         logger.error(error)
-                                        response.status(500).send('file');
+                                        response.status(500).send('bill');
                                     });
+                                }, function handleError(error) {
+                                    logger.error(error)
+                                    response.status(500).send('file');
+                                });
                             }
                         });
                     }
@@ -432,6 +446,7 @@ exports.deleteBillById = (request, response) => {
 
         }
     });
+    sdc.timing('billDelete.timer', DBtimer)
 }
 
 function formatDate(date) {
@@ -440,9 +455,9 @@ function formatDate(date) {
         day = '' + d.getDate(),
         year = d.getFullYear();
 
-    if (month.length < 2) 
+    if (month.length < 2)
         month = '0' + month;
-    if (day.length < 2) 
+    if (day.length < 2)
         day = '0' + day;
 
     return [year, month, day].join('-');

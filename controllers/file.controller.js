@@ -36,6 +36,7 @@ if (process.env.NODE_ENV == 'production') {
 
 exports.post = (request, response) => {
     sdc.increment('filePost.counter');
+    var timer = new Date()
     let billId = request.params.id
     let user = request.user;
     const id = uuid();
@@ -90,14 +91,17 @@ exports.post = (request, response) => {
                                         "url": url,
                                         "key_name": url
                                     };
+                                    var DBtimer = new Date()
                                     fileService.insertFile(params, function (msg) {
                                         if (msg == 'success') {
+                                            sdc.timing('DBfilePost.timer', DBtimer)
                                             // let s3Bucket = new AWS.S3({Bucket: process.env.S3_BUCKET_ADDR});
                                             var params = {
                                                 Bucket: process.env.S3_BUCKET_ADDR,
                                                 Key: url,
                                                 Body: file.data
                                             }
+                                            var S3timer = new Date()
                                             s3.upload(params, function (err, data) {
                                                 if (err) {
                                                     logger.error(err);
@@ -112,6 +116,7 @@ exports.post = (request, response) => {
 
 
                                                 } else {
+                                                    sdc.timing('S3filePost.timer', S3timer)
                                                     // console.log(data);
                                                     const params = [data.Location, data.key, id, owner_id, billId]
                                                     fileService.updateFile(params, function (msg) {
@@ -164,11 +169,12 @@ exports.post = (request, response) => {
             }
         }
     });
-
+    sdc.timing('filePost.timer', timer)
 }
 
 exports.getBillAttachment = (request, response) => {
     sdc.increment('fileGet.counter');
+    var timer = new Date()
     let user = request.user
     let billId = request.params.billId
     let fileId = request.params.fileId
@@ -187,6 +193,7 @@ exports.getBillAttachment = (request, response) => {
                     message: "Unauthorized access of bill"
                 });
             } else {
+                var DBtimer = new Date()
                 fileService.getFileByBillId(billId, function callback(results) {
                     if (results.length == 0) {
                         logger.info("No file found with this id");
@@ -201,7 +208,8 @@ exports.getBillAttachment = (request, response) => {
                                 message: 'No file found with this id'
                             })
                         } else {
-                            logger.info("Successfully updated the file")
+                            logger.info("Successfully retrieved the file")
+                            sdc.timing('DBfileGet.timer', DBtimer)
                             response.status(200).json({
                                 "file_name": file.file_name,
                                 "id": file.id,
@@ -214,10 +222,12 @@ exports.getBillAttachment = (request, response) => {
             }
         }
     });
+    sdc.timing('fileGet.timer', timer)
 }
 
 exports.deleteFileOfBill = (request, response) => {
     sdc.increment('fileDelete.counter');
+    var timer = new Date()
     let user = request.user
     let billId = request.params.billId
     let fileId = request.params.fileId
@@ -254,16 +264,18 @@ exports.deleteFileOfBill = (request, response) => {
                                 Bucket: process.env.S3_BUCKET_ADDR,
                                 Key: file.key_name
                             };
-
+                            var S3timer = new Date()
                             s3.deleteObject(params, function (err, data) {
                                 if (err) {
                                     logger.error(err)
                                     response.status(400).send(err);
-                                }
-                                else {
+                                } else {
+                                    sdc.timing('S3fileDelete.timer', S3timer)
                                     const params = [fileId, user.id, billId]
+                                    var DBtimer = new Date()
                                     fileService.deleteFileById(params, function callback(results) {
                                         logger.info(`Deleted ${results.affectedRows} row(s)`);
+                                        sdc.timing('DBfileDelete.timer', DBtimer)
                                         response.status(204).send();
                                     }, function handleError(error) {
                                         logger.error(err)
@@ -277,6 +289,7 @@ exports.deleteFileOfBill = (request, response) => {
             }
         }
     });
+    sdc.timing('fileDelete.timer', timer)
 }
 
 function formatDate(date) {
