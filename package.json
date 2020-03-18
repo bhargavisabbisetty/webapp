@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "app-root-path": "^3.0.0",
     "assert": "^2.0.0",
     "aws-sdk": "^2.626.0",
     "bcrypt": "^3.0.7",
@@ -31,8 +32,10 @@
     "production": "0.0.2",
     "regex": "^0.1.1",
     "should": "^13.2.3",
+    "statsd-client": "^0.4.4",
     "supertest": "^4.0.2",
-    "uuid": "^3.4.0"
+    "uuid": "^3.4.0",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"

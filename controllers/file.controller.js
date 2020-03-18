@@ -4,6 +4,8 @@ const saltRounds = 10
 const server = require('./../server')
 const uuid = require('uuid/v4')
 const Validator = require('./../services/validator')
+const logger = require('../config/winston')
+const sdc = require('../config/statsd-client')
 const validatorObj = new Validator()
 const aws = require('aws-sdk');
 var fs = require('fs')
@@ -33,7 +35,7 @@ if (process.env.NODE_ENV == 'production') {
  */
 
 exports.post = (request, response) => {
-
+    sdc.increment('filePost.counter');
     let billId = request.params.id
     let user = request.user;
     const id = uuid();
@@ -44,19 +46,20 @@ exports.post = (request, response) => {
 
     billService.getBillById(billId, function callback(results) {
         if (results.length == 0) {
-            console.log("No bill found with this id");
+            logger.info("No bill found with this id");
             response.status(404).json({
                 message: "No bill found with this id"
             });
         } else {
             let bill = results[0]
             if (bill.owner_id != user.id) {
-                console.log("Unauthorized access of bill");
+                logger.info("Unauthorized access of bill");
                 response.status(401).json({
                     message: "Unauthorized access of bill"
                 });
             } else {
                 if (!request.files) {
+                    logger.info("Please attach a file");
                     response.status(400).json({
                         message: "Please attach a file"
                     });
@@ -67,6 +70,7 @@ exports.post = (request, response) => {
                         url = fileFormat[0] + '_' + user.id.substring(1, 8) + '_' + billId.substring(1, 8) + '_' + Date.now() + '.' + fileFormat[fileFormat.length - 1]
                         var ext = fileFormat[fileFormat.length - 1]
                         if (ext != 'pdf' && ext != 'jpeg' && ext != 'jpg' && ext != 'png') {
+                            logger.info("Please attach a file with the following formats: jpg, png, jpeg, pdf")
                             response.status(400).json({
                                 message: "Please attach a file with the following formats: jpg, png, jpeg, pdf"
                             });
@@ -96,21 +100,23 @@ exports.post = (request, response) => {
                                             }
                                             s3.upload(params, function (err, data) {
                                                 if (err) {
-                                                    console.log(err);
+                                                    logger.error(err);
                                                     const params = [id, owner_id, billId]
                                                     fileService.deleteFileById(params, function callback(results) {
-                                                        console.log(`Deleted ${results.affectedRows} row(s)`);
+                                                        logger.info(`Deleted ${results.affectedRows} row(s)`);
                                                         response.status(500).send(err);
                                                     }, function handleError(error) {
+                                                        logger.error(error)
                                                         return response.status(500).send(error);
                                                     })
 
 
                                                 } else {
-                                                    console.log(data);
+                                                    // console.log(data);
                                                     const params = [data.Location, data.key, id, owner_id, billId]
                                                     fileService.updateFile(params, function (msg) {
                                                         if (msg == 'success') {
+                                                            logger.info("updated file")
                                                             response.status(201).json({
                                                                 "file_name": file.name,
                                                                 "id": id,
@@ -120,9 +126,11 @@ exports.post = (request, response) => {
                                                         } else {
                                                             const params = [id, owner_id, billId]
                                                             fileService.deleteFileById(params, function callback(results) {
-                                                                console.log(`Deleted ${results.affectedRows} row(s)`);
+                                                                logger.info(`Deleted ${results.affectedRows} row(s)`);
+                                                                logger.error(err)
                                                                 response.status(500).send(err);
                                                             }, function handleError(error) {
+                                                                logger.error(error)
                                                                 return response.status(500).send(error);
                                                             })
                                                         }
@@ -133,10 +141,12 @@ exports.post = (request, response) => {
 
 
                                         } else {
+                                            logger.error(msg)
                                             response.status(500).json(msg)
                                         }
                                     });
                                 } else {
+                                    logger.info("There is already a file attached to bill. Please delete it to attach new one")
                                     response.status(400).json({
                                         message: "There is already a file attached to bill. Please delete it to attach new one"
                                     });
@@ -145,6 +155,7 @@ exports.post = (request, response) => {
                             });
                         }
                     } else {
+                        logger.info("Bad request")
                         response.status(400).json({
                             message: "Bad request"
                         });
@@ -157,38 +168,40 @@ exports.post = (request, response) => {
 }
 
 exports.getBillAttachment = (request, response) => {
-
+    sdc.increment('fileGet.counter');
     let user = request.user
     let billId = request.params.billId
     let fileId = request.params.fileId
 
     billService.getBillById(billId, function callback(results) {
         if (results.length == 0) {
-            console.log("No bill found with this id");
+            logger.info("No bill found with this id");
             response.status(404).json({
                 message: "No bill found with this id"
             });
         } else {
             let bill = results[0];
             if (bill.owner_id != user.id) {
-                console.log("Unauthorized access of bill");
+                logger.info("Unauthorized access of bill");
                 response.status(401).json({
                     message: "Unauthorized access of bill"
                 });
             } else {
                 fileService.getFileByBillId(billId, function callback(results) {
                     if (results.length == 0) {
-                        console.log("No file found with this id");
+                        logger.info("No file found with this id");
                         response.status(404).json({
                             message: "No file found with this id"
                         });
                     } else {
                         let file = results[0];
                         if (file.id != fileId) {
+                            logger.info("No file found with this id")
                             response.status(404).json({
                                 message: 'No file found with this id'
                             })
                         } else {
+                            logger.info("Successfully updated the file")
                             response.status(200).json({
                                 "file_name": file.file_name,
                                 "id": file.id,
@@ -204,33 +217,35 @@ exports.getBillAttachment = (request, response) => {
 }
 
 exports.deleteFileOfBill = (request, response) => {
+    sdc.increment('fileDelete.counter');
     let user = request.user
     let billId = request.params.billId
     let fileId = request.params.fileId
 
     billService.getBillById(billId, function callback(results) {
         if (results.length == 0) {
-            console.log("No bill found with this id");
+            logger.info("No bill found with this id");
             response.status(404).json({
                 message: "No bill found with this id"
             });
         } else {
             let bill = results[0];
             if (bill.owner_id != user.id) {
-                console.log("Unauthorized access of bill");
+                logger.info("Unauthorized access of bill");
                 response.status(401).json({
                     message: "Unauthorized access of bill"
                 });
             } else {
                 fileService.getFileByBillId(billId, function callback(results) {
                     if (results.length == 0) {
-                        console.log("No file found with this id");
+                        logger.info("No file found with this id");
                         response.status(404).json({
                             message: "No file found with this id"
                         });
                     } else {
                         let file = results[0];
                         if (file.id != fileId) {
+                            logger.info("File id for given bill id is not matching")
                             response.status(400).json({
                                 message: 'File id for given bill id is not matching'
                             })
@@ -242,15 +257,17 @@ exports.deleteFileOfBill = (request, response) => {
 
                             s3.deleteObject(params, function (err, data) {
                                 if (err) {
+                                    logger.error(err)
                                     response.status(400).send(err);
                                 }
                                 else {
                                     const params = [fileId, user.id, billId]
                                     fileService.deleteFileById(params, function callback(results) {
-                                        console.log(`Deleted ${results.affectedRows} row(s)`);
+                                        logger.info(`Deleted ${results.affectedRows} row(s)`);
                                         response.status(204).send();
                                     }, function handleError(error) {
-                                        throw error
+                                        logger.error(err)
+                                        response.status(400).send(err);
                                     });
                                 }
                             });

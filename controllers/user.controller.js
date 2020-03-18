@@ -3,6 +3,8 @@ const saltRounds = 10
 const uuid = require('uuid/v4')
 const Validator = require('./../services/validator')
 const validatorObj = new Validator()
+const logger = require('../config/winston')
+const sdc = require('../config/statsd-client')
 var userService = ''
 if(process.env.NODE_ENV == 'production'){
 userService = require('./../services/user.service.mock')
@@ -16,6 +18,7 @@ userService = require('./../services/user.service');
  * This method helps to create new user.
  */
 exports.post = (request, response) => {
+    sdc.increment('userPost.counter');
     const id = uuid();
     const first_name = request.body.first_name;
     const last_name = request.body.last_name;
@@ -31,12 +34,14 @@ exports.post = (request, response) => {
                     userService.isUserExist(email_address, function(msg){
                         if (msg) {
                             console.log("User Email exists in the database..!!")
+                            logger.info("Bad Request : User Email exists in the database..!!");
                             response.status(400).json({
                                 message: "Bad Request : User Email exists in the database..!!"
                             });
                         } else {
                             bcrypt.hash(password, saltRounds, function (err, hash) {
                                 if (err) {
+                                    logger.err(err)
                                     response.status(500).json({
                                         error: err
                                     });
@@ -53,6 +58,7 @@ exports.post = (request, response) => {
                                 // console.log(params)
                                 userService.insertUser(params, function (msg) {
                                     if (msg == 'success') {
+                                        logger.info("successfully created user" + first_name)
                                         response.status(201).json({
                                                 "id": id,
                                                 "first_name": first_name,
@@ -62,6 +68,7 @@ exports.post = (request, response) => {
                                                 "account_updated": account_updated
                                         });
                                     } else {
+                                        logger.info("Bad Request : User Email exists..!!")
                                         response.status(400).json({
                                             message: "Bad Request : User Email exists..!!"
                                         });
@@ -71,25 +78,25 @@ exports.post = (request, response) => {
                         }
                     });
                 } else {
-                    console.log("Password is not strong enough");
+                    logger.info("Password is not strong enough");
                     response.status(400).json({
                         message: "Bad Request : Password is not strong enough"
                     });
                 }
             } else {
-                console.log("Invalid email_address as input");
+                logger.info("Invalid email_address as input");
                 response.status(400).json({
                     message: "Bad Request : Invalid email_address as input"
                 })
             }
         } else {
-            console.log("Please enter all details");
+            logger.info("Please enter all details");
             response.status(400).json({
                 message: "Bad Request : Please enter all details"
             });
         }
     } else {
-        console.log("Please enter valid input");
+        logger.info("Please enter valid input");
         response.status(400).json({
             message: "Bad Request : Please enter valid input"
         });
@@ -102,7 +109,9 @@ exports.post = (request, response) => {
  * This returns user details.
  */
 exports.get = (request, response) => {
+    sdc.increment('userGet.counter');
     let user = request.user
+    logger.info("user details with id " + user.id + " successfully retrieved")
     response.status(200).json({
             id: user.id,
             first_name: user.first_name,
@@ -119,6 +128,7 @@ exports.get = (request, response) => {
  * This method helps to update user details.
  */
 exports.put = (request, response) => {
+    sdc.increment('userPut.counter');
     const {
         first_name,
         last_name,
@@ -131,6 +141,7 @@ exports.put = (request, response) => {
                 if (validatorObj.checkPassword(password)) {
                     bcrypt.hash(password, saltRounds, function (err, hash) {
                         if (err) {
+                            logger.err(err)
                             response.status(500).json({
                                 error: err
                             });
@@ -139,34 +150,34 @@ exports.put = (request, response) => {
                         const params = [first_name, last_name, hash, account_updated, email_address];
                         userService.updateUser(params, function (msg) {
                             if (msg == 'success') {
-                                console.log("successfully updated")
+                                logger.info("successfully updated user details "+ email_address)
                                 response.status(204).send();
                             } else {
-                                console.log('sql error')
-                                throw msg
+                                logger.err('sql error of update')
+                                response.status(400).json({message: msg})
                             }
                         })
                     });
                 } else {
-                    console.log("Password is not strong enough");
+                    logger.info("Password is not strong enough");
                     response.status(400).json({
                         message: "Bad Request : Password is not strong enough"
                     });
                 }
             } else {
-                console.log("Will not be update email_address. Please enter your email_address which you used for authorization.");
+                logger.info("Will not be update email_address. Please enter your email_address which you used for authorization.");
                 response.status(400).json({
                     message: "Bad Request : Will not be update email_address. Please enter your email_address which you used for authorization."
                 });
             }
         } else {
-            console.log("Please enter all details");
+            logger.info("Please enter all details");
             response.status(400).json({
                 message: "Bad Request : Please enter all details"
             });
         }
     } else {
-        console.log("Please give valid input");
+        logger.info("Please give valid input");
         response.status(400).json({
             message: "Bad Request : Please give valid input"
         });
