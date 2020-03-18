@@ -404,6 +404,7 @@ exports.deleteBillById = (request, response) => {
                         billService.deleteBillById(params, function callback(results) {
                             sdc.timing('DBbillDelete.timer', DBtimer1)
                             logger.info(`Deleted ${results.affectedRows} row(s)`);
+                            sdc.timing('billDelete.timer', timer)
                             response.status(204).send();
                         }, function handleError(error) {
                             logger.error(error)
@@ -429,6 +430,7 @@ exports.deleteBillById = (request, response) => {
                                     billService.deleteBillById([billId, user.id], function callback(results) {
                                         sdc.timing('DBbillDelete.timer', DBtimer2)
                                         logger.info(`Deleted ${results.affectedRows} row(s)`);
+                                        sdc.timing('billDelete.timer', timer)
                                         response.status(204).send();
                                     }, function handleError(error) {
                                         logger.error(error)
@@ -446,7 +448,6 @@ exports.deleteBillById = (request, response) => {
 
         }
     });
-    sdc.timing('billDelete.timer', timer)
 }
 
 function formatDate(date) {
