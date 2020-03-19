@@ -210,6 +210,7 @@ exports.getBillAttachment = (request, response) => {
                         } else {
                             logger.info("Successfully retrieved the file")
                             sdc.timing('DBfileGet.timer', DBtimer)
+                            sdc.timing('fileGet.timer', timer)
                             response.status(200).json({
                                 "file_name": file.file_name,
                                 "id": file.id,
@@ -222,7 +223,6 @@ exports.getBillAttachment = (request, response) => {
             }
         }
     });
-    sdc.timing('fileGet.timer', timer)
 }
 
 exports.deleteFileOfBill = (request, response) => {
@@ -276,6 +276,7 @@ exports.deleteFileOfBill = (request, response) => {
                                     fileService.deleteFileById(params, function callback(results) {
                                         logger.info(`Deleted ${results.affectedRows} row(s)`);
                                         sdc.timing('DBfileDelete.timer', DBtimer)
+                                        sdc.timing('fileDelete.timer', timer)
                                         response.status(204).send();
                                     }, function handleError(error) {
                                         logger.error(err)
@@ -289,7 +290,6 @@ exports.deleteFileOfBill = (request, response) => {
             }
         }
     });
-    sdc.timing('fileDelete.timer', timer)
 }
 
 function formatDate(date) {

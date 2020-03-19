@@ -190,13 +190,13 @@ exports.getAll = (request, response) => {
             }
             sdc.timing('DBbillGetAll.timer', DBtimer)
             logger.info("Retrieved all bills")
+            sdc.timing('billGetAll.timer', timer)
             response.status(200).json(resultArray)
         }
     }, function errorHandler(error) {
         logger.error(error)
         response.status(500).json(error);
     });
-    sdc.timing('billGetAll.timer', timer)
 
 }
 
