@@ -21,6 +21,8 @@ if (process.env.NODE_ENV != 'production') {
     if (err) {
       console.log('error in creating database', err);
       logger.error('error in creating database', err);
+      logger.error(process.env.MYSQL_DATABASE);
+      logger.error(process.env.MYSQL_HOST);
       return;
     }
     console.log('created a new database');
