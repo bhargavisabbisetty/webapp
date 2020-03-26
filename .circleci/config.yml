@@ -119,9 +119,9 @@ jobs:
 
 workflows:
   version: 2
-#   pr-check-workflow:
-#     jobs:
-#     - pr_check
+  pr-check-workflow:
+    jobs:
+    - pr_check
   build-workflow:
     jobs:
     - build:
