@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000
-const logger = require('../config/winston')
+const logger = require('./config/winston')
 const bodyParser = require('body-parser')
 const mysql = require('mysql');
 const basicAuth = require('./helpers/basic_authentication');
