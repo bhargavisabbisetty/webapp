@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt')
 const server = require('./../server')
-const logger = require('./../config/winston')
 
 module.exports = {
     authenticate,
@@ -43,27 +42,19 @@ function authenticate(email_address, password, callback) {
     });
 }
 
-function isUserExist(email_address, callback){
+function isUserExist(email_address, callback) {
     server.connection.query('SELECT * from userdetails where email_address = ?', email_address, function (error, results, fields) {
-        if( error ){
-            logger.error(error)
-            callback(false)
-        }
-        else if (results.length == undefined){
-            callback(false)
-        }
-        else if (results.length != 0){
+        if (results.length != 0) {
             callback(true)
-        }
-        else{
+        } else {
             callback(false)
         }
     });
 }
+
 function insertUser(params, callback) {
     server.connection.query('INSERT INTO userdetails SET ?', params, function (error, results, fields) {
         if (error) {
-            logger.error(error)
             callback('error')
         } else {
             callback('success')
