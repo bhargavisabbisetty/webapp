@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000
+const logger = require('./config/winston')
 const bodyParser = require('body-parser')
 const mysql = require('mysql');
 const basicAuth = require('./helpers/basic_authentication');
@@ -19,19 +20,23 @@ if (process.env.NODE_ENV != 'production') {
   connection.query('CREATE DATABASE IF NOT EXISTS ??', process.env.MYSQL_DATABASE, function (err, results) {
     if (err) {
       console.log('error in creating database', err);
+      logger.error('error in creating database', err);
       return;
     }
     console.log('created a new database');
+    logger.info('created a new database');
 
     connection.changeUser({
       database: process.env.MYSQL_DATABASE
     }, function (err) {
       if (err) {
         console.log('error in changing database', err);
+        logger.error('error in changing database', err);
         return;
       }
     });
       console.log('connected as id ' + connection.threadId);
+      logger.info('connected as id ' + connection.threadId);
       sql.sqlInit();
   });
 };

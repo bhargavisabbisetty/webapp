@@ -1,5 +1,5 @@
 const server = require('./../server')
-
+const logger = require('../config/winston')
 module.exports = {
     sqlInit
 };
@@ -16,6 +16,7 @@ function sqlInit() {
         } 
         else{
             console.log('Successfully executed create query for user details')
+            logger.info("Successfully executed create query for user details");
         }
     });
     server.connection.query('create table IF NOT EXISTS billdetails'+ 
@@ -29,6 +30,7 @@ function sqlInit() {
         } 
         else{
             console.log('Successfully executed create query for bill details')
+            logger.info("Successfully executed create query for bill details")
         }
     });
     server.connection.query('create table IF NOT EXISTS filedetails'+ 
@@ -41,6 +43,7 @@ function sqlInit() {
         } 
         else{
             console.log('Successfully executed create query for file details')
+            logger.info("Successfully executed create query for bill details")
         }
     });
 
