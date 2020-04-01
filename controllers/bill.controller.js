@@ -458,7 +458,10 @@ exports.sendBillsAsMail = (request, response) => {
     var timer = new Date()
     let user = request.user
     var params = {
-        MessageBody: JSON.stringify(request.user.email_address),
+        MessageBody: JSON.stringify({
+            username: request.user.email_address,
+            id: request.user.id    
+        }),
         QueueUrl: process.env.SQS_QUEUE_URL,
         DelaySeconds: 0,
         MessageGroupId: "bill"
@@ -478,7 +481,12 @@ exports.sendBillsAsMail = (request, response) => {
 const polling = Consumer.create({
     queueUrl: process.env.SQS_QUEUE_URL,
     handleMessage: async (message) => {
-        logger.info("Success"+JSON.stringify(message));
+        let body = JSON.parse(message.body)
+        logger.info(JSON.stringify(body.email_address))
+        logger.info(JSON.stringify(body.id));
+        billService.getAllBillIdByUserId(JSON.stringify(body.id),function(results){
+            logger.info(JSON.stringify(results));
+        });
     }
   });
    
