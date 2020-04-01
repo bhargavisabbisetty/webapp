@@ -7,7 +7,8 @@ module.exports = {
     getAll,
     getBillById,
     deleteBillById,
-    getBillsWithAttachmentsBasedOnUserId
+    getBillsWithAttachmentsBasedOnUserId,
+    getAllBillIdByUserId
 };
 
 
@@ -24,6 +25,12 @@ function insertBill(params, callback) {
 
 function getAll(user, callback) {
     server.connection.query('SELECT * from billdetails where owner_id = ?', user.id, function (error, results, fields) {
+        callback(results)
+    });
+}
+
+function getAllBillIdByUserId(user, callback) {
+    server.connection.query('SELECT id from billdetails where owner_id = ?', user.id, function (error, results, fields) {
         callback(results)
     });
 }
