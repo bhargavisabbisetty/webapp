@@ -1,6 +1,7 @@
 var bcrypt = require('bcrypt');
 const saltRounds = 10
 const aws = require('aws-sdk');
+aws.config.update({region: 'us-east-1'});
 const server = require('./../server')
 const uuid = require('uuid/v4')
 const Validator = require('./../services/validator')
