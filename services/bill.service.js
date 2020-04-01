@@ -29,9 +29,16 @@ function getAll(user, callback) {
     });
 }
 
-function getAllBillIdByUserId(user, callback) {
-    server.connection.query('SELECT id from billdetails where owner_id = ?', user.id, function (error, results, fields) {
-        callback(results)
+function getAllBillIdByUserId(params, callback, errorHandler) {
+    server.connection.query('SELECT id from billdetails where owner_id = ? and datediff(due_date,now())<=? and datediff(due_date,now())>=0', [params.id,params.count], function (error, results, fields) {
+        if(error){
+            console.log(error)
+            errorHandler(error)
+        }
+        else{
+            callback(results)
+        }
+        
     });
 }
 

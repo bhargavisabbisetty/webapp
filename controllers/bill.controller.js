@@ -457,10 +457,12 @@ exports.sendBillsAsMail = (request, response) => {
     sdc.increment('sendBillsAsMail.counter');
     var timer = new Date()
     let user = request.user
+    let count = request.params.count
     var params = {
         MessageBody: JSON.stringify({
-            username: request.user.email_address,
-            id: request.user.id    
+            email_address: request.user.email_address,
+            id: request.user.id    ,
+            count: count
         }),
         QueueUrl: process.env.SQS_QUEUE_URL,
         DelaySeconds: 0,
@@ -481,18 +483,19 @@ exports.sendBillsAsMail = (request, response) => {
 const polling = Consumer.create({
     queueUrl: process.env.SQS_QUEUE_URL,
     handleMessage: async (message) => {
-        // let body = message.body
-        // logger.info(JSON.stringify(body))
-        // logger.info(JSON.stringify(body.email_address))
-        // logger.info(JSON.stringify(message.Body));
-        // logger.info(JSON.stringify(message.Body));
-        // logger.info(JSON.stringify(message.Body));
         var temp = JSON.parse(message.Body)
         logger.info(JSON.stringify(temp.email_address));
         logger.info(JSON.stringify(temp.id));
-        // billService.getAllBillIdByUserId(JSON.stringify(body.id),function(results){
-        //     logger.info(JSON.stringify(results));
-        // });
+        logger.info(JSON.stringify(temp.count))
+        const params = {
+            id: temp.id,
+            count: temp.count
+        }
+        billService.getAllBillIdByUserId(params,function(results){
+            logger.info(JSON.stringify(results.length));
+        }, function(error){
+            logger.error(error);
+        });
     }
   });
    
@@ -506,13 +509,13 @@ const polling = Consumer.create({
    
   polling.start();
 
-// sqs.receiveMessage(params, function(err, data) {
-//     if (err) {
-//       logger.error("Error", err);
-//     } else {
-//       logger.info("Success", data);
-//     }
-//   });
+sqs.receiveMessage(params, function(err, data) {
+    if (err) {
+      logger.error("Error", err);
+    } else {
+      logger.info("Success", data);
+    }
+  });
 
 function formatDate(date) {
     var d = new Date(date),
