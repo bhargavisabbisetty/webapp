@@ -481,10 +481,10 @@ exports.sendBillsAsMail = (request, response) => {
 const polling = Consumer.create({
     queueUrl: process.env.SQS_QUEUE_URL,
     handleMessage: async (message) => {
-        let body = message.body
-        logger.info(JSON.stringify(body))
-        logger.info(JSON.stringify(body.email_address))
-        logger.info(JSON.stringify(body.id));
+        // let body = message.body
+        // logger.info(JSON.stringify(body))
+        // logger.info(JSON.stringify(body.email_address))
+        logger.info(JSON.stringify(message));
         // billService.getAllBillIdByUserId(JSON.stringify(body.id),function(results){
         //     logger.info(JSON.stringify(results));
         // });
