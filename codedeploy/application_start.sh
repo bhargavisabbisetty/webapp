@@ -8,3 +8,4 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-c
 sudo pm2 start server.js
 echo "hi"
 echo $MYSQL_DATABASE
+echo $SQS_QUEUE_URL
