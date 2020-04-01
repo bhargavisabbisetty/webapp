@@ -478,7 +478,7 @@ exports.sendBillsAsMail = (request, response) => {
 const polling = Consumer.create({
     queueUrl: process.env.SQS_QUEUE_URL,
     handleMessage: async (message) => {
-        logger.info("Success"+message);
+        logger.info("Success"+JSON.stringify(message));
     }
   });
    
