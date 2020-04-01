@@ -468,12 +468,13 @@ exports.sendBillsAsMail = (request, response) => {
     };
     sqs.sendMessage(params, function(err, data) {
         if(err) {
-            response.status(400).send(err);
+            logger.error(err);
         }
         else {
-            response.status(201).send("Request is successfully made");
+            logger.info("Request is successfully made");
         }
     });
+    response.status(201).send("Request is successfully made");
     sdc.timing('sendBillsAsMail.timer', timer)
 
 }
@@ -490,7 +491,12 @@ const polling = Consumer.create({
             count: temp.count
         }
         billService.getAllBillIdByUserId(params,function(results){
-            logger.info(JSON.stringify(results.length));
+            if(results.length == 0){
+                logger.info("there are no bills with particular due time");
+            }
+            else{
+                logger.info(JSON.stringify(results))
+            }
         }, function(error){
             logger.error(error);
         });
