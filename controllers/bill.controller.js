@@ -484,7 +484,9 @@ const polling = Consumer.create({
         // let body = message.body
         // logger.info(JSON.stringify(body))
         // logger.info(JSON.stringify(body.email_address))
-        logger.info(JSON.stringify(message.Body));
+        logger.info(JSON.stringify(message.Body[0].email_address));
+        logger.info(JSON.stringify(message.Body.email_address));
+        logger.info(JSON.stringify(message.Body.id));
         // billService.getAllBillIdByUserId(JSON.stringify(body.id),function(results){
         //     logger.info(JSON.stringify(results));
         // });
