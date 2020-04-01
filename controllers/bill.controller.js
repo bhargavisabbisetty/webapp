@@ -481,7 +481,8 @@ exports.sendBillsAsMail = (request, response) => {
 const polling = Consumer.create({
     queueUrl: process.env.SQS_QUEUE_URL,
     handleMessage: async (message) => {
-        let body = JSON.parse(message.body)
+        let body = message.body
+        logger.info(JSON.stringify(body))
         logger.info(JSON.stringify(body.email_address))
         logger.info(JSON.stringify(body.id));
         // billService.getAllBillIdByUserId(JSON.stringify(body.id),function(results){
