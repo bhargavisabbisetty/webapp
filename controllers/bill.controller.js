@@ -509,13 +509,13 @@ const polling = Consumer.create({
    
   polling.start();
 
-sqs.receiveMessage(params, function(err, data) {
-    if (err) {
-      logger.error("Error", err);
-    } else {
-      logger.info("Success", data);
-    }
-  });
+// sqs.receiveMessage(params, function(err, data) {
+//     if (err) {
+//       logger.error("Error", err);
+//     } else {
+//       logger.info("Success", data);
+//     }
+//   });
 
 function formatDate(date) {
     var d = new Date(date),
