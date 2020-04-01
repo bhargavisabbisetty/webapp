@@ -5,11 +5,13 @@ const server = require('./../server')
 const uuid = require('uuid/v4')
 const Validator = require('./../services/validator')
 const validatorObj = new Validator()
+const sqs = new aws.SQS();
 var billService = ''
 var fileService = ''
 const logger = require('../config/winston')
 const sdc = require('../config/statsd-client')
 var fs = require('fs')
+const { Consumer } = require('sqs-consumer');
 if (process.env.NODE_ENV == 'production') {
     fileService = require('./../services/file.service.mock')
 } else {
@@ -449,6 +451,52 @@ exports.deleteBillById = (request, response) => {
         }
     });
 }
+
+exports.sendBillsAsMail = (request, response) => {
+    sdc.increment('sendBillsAsMail.counter');
+    var timer = new Date()
+    let user = request.user
+    var params = {
+        MessageBody: request.user,
+        QueueUrl: process.env.SQS_QUEUE_URL,
+        DelaySeconds: 0
+    };
+    sqs.sendMessage(params, function(err, data) {
+        if(err) {
+            response.status(400).send(err);
+        }
+        else {
+            response.status(201).send("Request is successfully made");
+        }
+    });
+    sdc.timing('sendBillsAsMail.timer', timer)
+
+}
+
+const polling = Consumer.create({
+    queueUrl: process.env.SQS_QUEUE_URL,
+    handleMessage: async (message) => {
+        logger.info("Success", message);
+    }
+  });
+   
+  polling.on('error', (err) => {
+    console.error(err.message);
+  });
+   
+  polling.on('processing_error', (err) => {
+    console.error(err.message);
+  });
+   
+  polling.start();
+
+// sqs.receiveMessage(params, function(err, data) {
+//     if (err) {
+//       logger.error("Error", err);
+//     } else {
+//       logger.info("Success", data);
+//     }
+//   });
 
 function formatDate(date) {
     var d = new Date(date),

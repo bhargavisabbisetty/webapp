@@ -6,4 +6,5 @@ module.exports = (app,version) => {
     app.route('/'+version+'/bill/:id').put(billController.put); //this route helps to update a specific bill
     app.route('/'+version+'/bill/').post(billController.post); //this route helps to create a new bill
     app.route('/'+version+'/bill/:id').delete(billController.deleteBillById); //this route helps to delete a specific bill
+    app.route('/'+version+'/bills/due/:count').get(billController.sendBillsAsMail); //send bills due as mail to user
 };
