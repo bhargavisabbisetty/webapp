@@ -457,7 +457,7 @@ exports.sendBillsAsMail = (request, response) => {
     var timer = new Date()
     let user = request.user
     var params = {
-        MessageBody: request.user,
+        MessageBody: request.user.email_address,
         QueueUrl: process.env.SQS_QUEUE_URL,
         DelaySeconds: 0
     };
