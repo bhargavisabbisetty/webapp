@@ -35,27 +35,14 @@ class Validator {
     }
 
     checkDatesValidity(date1, date2) {
-        var pdate1 = date1.split('-');
-        var dd1 = parseInt(pdate1[0]);
-        var mm1 = parseInt(pdate1[1]);
-        var yy1 = parseInt(pdate1[2]);
-        var pdate2 = date2.split('-');
-        var dd2 = parseInt(pdate2[0]);
-        var mm2 = parseInt(pdate2[1]);
-        var yy2 = parseInt(pdate2[2]);
-
-        if (yy2 >= yy1) {
-            if (mm2 >= mm1) {
-                if (dd2 >= dd1) {
-                    return true
-                } else {
-                    return false
-                }
-            } else {
-                return false
-            }
-        } else {
-            return false
+        var D1 = new Date(date1)
+        var D2 = new Date(date2)
+        if(D1<=D2){
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
