@@ -460,7 +460,8 @@ exports.sendBillsAsMail = (request, response) => {
     var params = {
         MessageBody: request.user.email_address,
         QueueUrl: process.env.SQS_QUEUE_URL,
-        DelaySeconds: 0
+        DelaySeconds: 0,
+        MessageGroupId: "bill"
     };
     sqs.sendMessage(params, function(err, data) {
         if(err) {
