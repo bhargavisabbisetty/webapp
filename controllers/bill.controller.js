@@ -478,16 +478,16 @@ exports.sendBillsAsMail = (request, response) => {
 const polling = Consumer.create({
     queueUrl: process.env.SQS_QUEUE_URL,
     handleMessage: async (message) => {
-        logger.info("Success", message);
+        logger.info("Success"+message);
     }
   });
    
   polling.on('error', (err) => {
-    console.error(err.message);
+    logs.error(err.message);
   });
    
   polling.on('processing_error', (err) => {
-    console.error(err.message);
+    logs.error(err.message);
   });
    
   polling.start();

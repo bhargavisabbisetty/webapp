@@ -39,6 +39,7 @@ if (process.env.NODE_ENV != 'production') {
     });
       console.log('connected as id ' + connection.threadId);
       logger.info('connected as id ' + connection.threadId);
+      logger.info(process.env.SQS_QUEUE_URL)
       sql.sqlInit();
   });
 };
