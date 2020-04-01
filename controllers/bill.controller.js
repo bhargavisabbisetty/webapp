@@ -484,18 +484,18 @@ const polling = Consumer.create({
         let body = JSON.parse(message.body)
         logger.info(JSON.stringify(body.email_address))
         logger.info(JSON.stringify(body.id));
-        billService.getAllBillIdByUserId(JSON.stringify(body.id),function(results){
-            logger.info(JSON.stringify(results));
-        });
+        // billService.getAllBillIdByUserId(JSON.stringify(body.id),function(results){
+        //     logger.info(JSON.stringify(results));
+        // });
     }
   });
    
   polling.on('error', (err) => {
-    logs.error(err.message);
+    logger.error(err.message);
   });
    
   polling.on('processing_error', (err) => {
-    logs.error(err.message);
+    logger.error(err.message);
   });
    
   polling.start();
