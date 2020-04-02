@@ -467,7 +467,7 @@ exports.sendBillsAsMail = (request, response) => {
     } else if (count < 0) {
         response.status(400).send("Please enter valid request param. It cannot be negative value");
     } else {
-        response.status(201).send("Request is successfully made");
+        response.status(200).send("Request is successfully made");
         var params = {
             MessageBody: JSON.stringify({
                 email_address: request.user.email_address,
