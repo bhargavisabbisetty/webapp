@@ -462,6 +462,15 @@ exports.sendBillsAsMail = (request, response) => {
     var timer = new Date()
     let user = request.user
     let count = request.params.count
+    if(isNaN(count)){
+        response.status(400).send("Please enter valid request param");
+    }
+    else if(count<0){
+        response.status(400).send("Please enter valid request param. It cannot be negative value");
+    }
+    else{
+        response.status(201).send("Request is successfully made");
+    }
     var params = {
         MessageBody: JSON.stringify({
             email_address: request.user.email_address,
@@ -470,7 +479,7 @@ exports.sendBillsAsMail = (request, response) => {
         }),
         QueueUrl: process.env.SQS_QUEUE_URL
     };
-    response.status(201).send("Request is successfully made");
+    
     sqs.sendMessage(params, function (err, data) {
         if (err) {
             logger.error(err);
