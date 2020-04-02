@@ -1,7 +1,9 @@
 var bcrypt = require('bcrypt');
 const saltRounds = 10
 const aws = require('aws-sdk');
-aws.config.update({region: 'us-east-1'});
+aws.config.update({
+    region: 'us-east-1'
+});
 const server = require('./../server')
 const uuid = require('uuid/v4')
 const Validator = require('./../services/validator')
@@ -12,7 +14,9 @@ var fileService = ''
 const logger = require('../config/winston')
 const sdc = require('../config/statsd-client')
 var fs = require('fs')
-const { Consumer } = require('sqs-consumer');
+const {
+    Consumer
+} = require('sqs-consumer');
 if (process.env.NODE_ENV == 'production') {
     fileService = require('./../services/file.service.mock')
 } else {
@@ -461,20 +465,19 @@ exports.sendBillsAsMail = (request, response) => {
     var params = {
         MessageBody: JSON.stringify({
             email_address: request.user.email_address,
-            id: request.user.id    ,
+            id: request.user.id,
             count: count
         }),
         QueueUrl: process.env.SQS_QUEUE_URL
     };
-    sqs.sendMessage(params, function(err, data) {
-        if(err) {
+    response.status(201).send("Request is successfully made");
+    sqs.sendMessage(params, function (err, data) {
+        if (err) {
             logger.error(err);
-        }
-        else {
+        } else {
             logger.info("Request is successfully made");
         }
     });
-    response.status(201).send("Request is successfully made");
     sdc.timing('sendBillsAsMail.timer', timer)
 
 }
@@ -490,28 +493,50 @@ const polling = Consumer.create({
             id: temp.id,
             count: temp.count
         }
-        billService.getAllBillIdByUserId(params,function(results){
-            if(results.length == 0){
+        billService.getAllBillIdByUserId(params, function (results) {
+            if (results.length == 0) {
                 logger.info("there are no bills with particular due time");
-            }
-            else{
+            } else {
                 logger.info(JSON.stringify(results))
+                var sns = new aws.SNS();
+                var payload = {
+                    default: 'Hello World',
+                    data: {
+                        Email: temp.email_address,
+                        bills: results,
+                        count: temp.count
+                    }
+                };
+                payload.data = JSON.stringify(payload.data)
+                payload = JSON.stringify(payload)
+                let params = {
+                    Message: payload,
+                    TopicArn: process.env.SNS_TOPIC_ARN
+                }
+                sns.publish(params, (err, data) => {
+                    if (err) {
+                        logger.error(err)
+                    } else {
+                        logger.info("published sns successfully");
+                        console.log("sns publish success" + data);
+                    }
+                });
             }
-        }, function(error){
+        }, function (error) {
             logger.error(error);
         });
     }
-  });
-   
-  polling.on('error', (err) => {
+});
+
+polling.on('error', (err) => {
     logger.error(err.message);
-  });
-   
-  polling.on('processing_error', (err) => {
+});
+
+polling.on('processing_error', (err) => {
     logger.error(err.message);
-  });
-   
-  polling.start();
+});
+
+polling.start();
 
 // sqs.receiveMessage(params, function(err, data) {
 //     if (err) {
