@@ -462,32 +462,30 @@ exports.sendBillsAsMail = (request, response) => {
     var timer = new Date()
     let user = request.user
     let count = request.params.count
-    if(isNaN(count)){
+    if (isNaN(count)) {
         response.status(400).send("Please enter valid request param");
-    }
-    else if(count<0){
+    } else if (count < 0) {
         response.status(400).send("Please enter valid request param. It cannot be negative value");
-    }
-    else{
+    } else {
         response.status(201).send("Request is successfully made");
+        var params = {
+            MessageBody: JSON.stringify({
+                email_address: request.user.email_address,
+                id: request.user.id,
+                count: count
+            }),
+            QueueUrl: process.env.SQS_QUEUE_URL
+        };
+
+        sqs.sendMessage(params, function (err, data) {
+            if (err) {
+                logger.error(err);
+            } else {
+                logger.info("Request is successfully made");
+            }
+        });
+        sdc.timing('sendBillsAsMail.timer', timer)
     }
-    var params = {
-        MessageBody: JSON.stringify({
-            email_address: request.user.email_address,
-            id: request.user.id,
-            count: count
-        }),
-        QueueUrl: process.env.SQS_QUEUE_URL
-    };
-    
-    sqs.sendMessage(params, function (err, data) {
-        if (err) {
-            logger.error(err);
-        } else {
-            logger.info("Request is successfully made");
-        }
-    });
-    sdc.timing('sendBillsAsMail.timer', timer)
 
 }
 
@@ -547,13 +545,6 @@ polling.on('processing_error', (err) => {
 
 polling.start();
 
-// sqs.receiveMessage(params, function(err, data) {
-//     if (err) {
-//       logger.error("Error", err);
-//     } else {
-//       logger.info("Success", data);
-//     }
-//   });
 
 function formatDate(date) {
     var d = new Date(date),
