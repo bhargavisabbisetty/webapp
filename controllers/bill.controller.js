@@ -501,9 +501,9 @@ const polling = Consumer.create({
             count: temp.count
         }
         billService.getAllBillIdByUserId(params, function (results) {
-            if (results.length == 0) {
-                logger.info("there are no bills with particular due time");
-            } else {
+            // if (results.length == 0) {
+            //     logger.info("there are no bills with particular due time");
+            // } else {
                 logger.info(JSON.stringify(results))
                 var sns = new aws.SNS();
                 var payload = {
@@ -528,7 +528,7 @@ const polling = Consumer.create({
                         console.log("sns publish success" + data);
                     }
                 });
-            }
+            // }
         }, function (error) {
             logger.error(error);
         });
