@@ -7,7 +7,6 @@ const mysql = require('mysql');
 const basicAuth = require('./helpers/basic_authentication');
 const sql = require('./helpers/sql_init')
 const fileUpload = require('express-fileupload');
-// module.exports = {connection}
 require('dotenv').config({
   silent: process.env.NODE_ENV === 'production'
 });
@@ -25,33 +24,7 @@ if (process.env.NODE_ENV != 'production') {
 
     console.log('Connected to the MySQL server.');
     sql.sqlInit();
-    // console.log(connection);
   });
-  // connection.query('CREATE DATABASE IF NOT EXISTS ??', process.env.MYSQL_DATABASE, function (err, results) {
-  //   if (err) {
-  //     console.log('error in creating database', err);
-  //     logger.error('error in creating database', err);
-  //     logger.error(process.env.MYSQL_DATABASE);
-  //     logger.error(process.env.MYSQL_HOST);
-  //     return;
-  //   }
-  //   console.log('created a new database');
-  //   logger.info('created a new database');
-
-  //   connection.changeUser({
-  //     database: process.env.MYSQL_DATABASE
-  //   }, function (err) {
-  //     if (err) {
-  //       console.log('error in changing database', err);
-  //       logger.error('error in changing database', err);
-  //       return;
-  //     }
-  //   });
-  //     console.log('connected as id ' + connection.threadId);
-  //     logger.info('connected as id ' + connection.threadId);
-  //     logger.info(process.env.SQS_QUEUE_URL)
-      
-  // });
 };
 app.get('/', (req, res) => {
   res.send('CSYE 6225 Assignment 2');
