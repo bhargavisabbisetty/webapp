@@ -14,14 +14,13 @@ require('dotenv').config({
 if (process.env.NODE_ENV != 'production') {
   var connection = mysql.createConnection({
     host: process.env.MYSQL_HOST,
-    user: process.env.MYSQL_USER,
+    user: "dbuser",
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE
   });
   connection.connect(function(err) {
     if (err) {
       logger.info(process.env.MYSQL_HOST)
-      logger.info(process.env.MYSQL_USER)
       logger.info(process.env.MYSQL_PASSWORD)
       logger.info(process.env.MYSQL_DATABASE)
       return logger.error('error: ' + err.message);
