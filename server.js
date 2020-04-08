@@ -20,10 +20,14 @@ if (process.env.NODE_ENV != 'production') {
   });
   connection.connect(function(err) {
     if (err) {
-      return log.error('error: ' + err.message);
+      logger.info(process.env.MYSQL_HOST)
+      logger.info(process.env.MYSQL_USER)
+      logger.info(process.env.MYSQL_PASSWORD)
+      logger.info(process.env.MYSQL_DATABASE)
+      return logger.error('error: ' + err.message);
     }
 
-    log.info('Connected to the MySQL server.');
+    logger.info('Connected to the MySQL server.');
     sql.sqlInit();
   });
 };
