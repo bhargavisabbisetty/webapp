@@ -14,34 +14,36 @@ if (process.env.NODE_ENV != 'production') {
   var connection = mysql.createConnection({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE
   });
+  connection.connect();
+  // connection.query('CREATE DATABASE IF NOT EXISTS ??', process.env.MYSQL_DATABASE, function (err, results) {
+  //   if (err) {
+  //     console.log('error in creating database', err);
+  //     logger.error('error in creating database', err);
+  //     logger.error(process.env.MYSQL_DATABASE);
+  //     logger.error(process.env.MYSQL_HOST);
+  //     return;
+  //   }
+  //   console.log('created a new database');
+  //   logger.info('created a new database');
 
-  connection.query('CREATE DATABASE IF NOT EXISTS ??', process.env.MYSQL_DATABASE, function (err, results) {
-    if (err) {
-      console.log('error in creating database', err);
-      logger.error('error in creating database', err);
-      logger.error(process.env.MYSQL_DATABASE);
-      logger.error(process.env.MYSQL_HOST);
-      return;
-    }
-    console.log('created a new database');
-    logger.info('created a new database');
-
-    connection.changeUser({
-      database: process.env.MYSQL_DATABASE
-    }, function (err) {
-      if (err) {
-        console.log('error in changing database', err);
-        logger.error('error in changing database', err);
-        return;
-      }
-    });
-      console.log('connected as id ' + connection.threadId);
-      logger.info('connected as id ' + connection.threadId);
-      logger.info(process.env.SQS_QUEUE_URL)
-      sql.sqlInit();
-  });
+    // connection.changeUser({
+    //   database: process.env.MYSQL_DATABASE
+    // }, function (err) {
+    //   if (err) {
+    //     console.log('error in changing database', err);
+    //     logger.error('error in changing database', err);
+    //     return;
+    //   }
+    // });
+  //     console.log('connected as id ' + connection.threadId);
+  //     logger.info('connected as id ' + connection.threadId);
+  //     logger.info(process.env.SQS_QUEUE_URL)
+      
+  // });
+  sql.sqlInit();
 };
 app.get('/', (req, res) => {
   res.send('CSYE 6225 Assignment 2');
