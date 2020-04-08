@@ -16,12 +16,7 @@ if (process.env.NODE_ENV != 'production') {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-    ssl: {
-      ca: fs.readFileSync('/rdsdbdata/rds-metadata/ca-cert.pem'),
-      cert: fs.readFileSync('/rdsdbdata/rds-metadata/server-cert.pem'),
-      key: fs.readFileSync('/rdsdbdata/rds-metadata/server-key.pem')
-    }
+    database: process.env.MYSQL_DATABASE
   });
   connection.connect(function(err) {
     if (err) {
