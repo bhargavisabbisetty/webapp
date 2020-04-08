@@ -22,7 +22,7 @@ if (process.env.NODE_ENV != 'production') {
       return console.error('error: ' + err.message);
     }
 
-    console.log('Connected to the MySQL server.');
+    log.info('Connected to the MySQL server.');
     sql.sqlInit();
   });
 };
