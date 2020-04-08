@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs')
 const app = express();
 const port = process.env.PORT || 3000
 const logger = require('./config/winston')
@@ -15,11 +16,16 @@ if (process.env.NODE_ENV != 'production') {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE
+    database: process.env.MYSQL_DATABASE,
+    ssl: {
+      ca: fs.readFileSync('/rdsdbdata/rds-metadata/ca-cert.pem'),
+      cert: fs.readFileSync('/rdsdbdata/rds-metadata/server-cert.pem'),
+      key: fs.readFileSync('/rdsdbdata/rds-metadata/server-key.pem')
+    }
   });
   connection.connect(function(err) {
     if (err) {
-      return console.error('error: ' + err.message);
+      return log.error('error: ' + err.message);
     }
 
     log.info('Connected to the MySQL server.');
