@@ -17,7 +17,8 @@ if (process.env.NODE_ENV != 'production') {
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
-    port: process.env.MYSQL_PORT
+    port: process.env.MYSQL_PORT,
+    ssl: process.env.SSL_TYPE
   });
   connection.connect(function(err) {
     if (err) {
